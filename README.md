@@ -5,6 +5,10 @@
 <h1 align="center">TAY — System Optimizer</h1>
 
 <p align="center">
+  <strong>Version:</strong> v0.1.1.2
+</p>
+
+<p align="center">
   <strong>A modern, native Windows system optimization &amp; monitoring tool.</strong><br/>
   Built with WinUI 3 &amp; .NET 8 · Lightweight · Real-time Telemetry
 </p>

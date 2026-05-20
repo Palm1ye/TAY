@@ -99,8 +99,20 @@ if (-not (Test-Path $issPath)) {
     Write-Error "Could not find installer.iss in the workspace root!"
 }
 
+# Resolve version from Directory.Build.props for consistent packaging
+$versionProps = Join-Path $PSScriptRoot "Directory.Build.props"
+$tayVersion = ""
+if (Test-Path $versionProps) {
+    try {
+        [xml]$props = Get-Content $versionProps
+        $tayVersion = $props.Project.PropertyGroup.TayVersion
+        if (-not $tayVersion) { $tayVersion = $props.Project.PropertyGroup.Version }
+    } catch { }
+}
+if (-not $tayVersion) { $tayVersion = "0.0.0" }
+
 # Run ISCC
-& $isccPath $issPath
+& $isccPath "/DMyAppVersion=$tayVersion" $issPath
 
 Write-Host "`n=========================================" -ForegroundColor Green
 Write-Host " BUILD COMPLETE!                         " -ForegroundColor Green

@@ -23,7 +23,7 @@ namespace TAY.ViewModels
         private bool _autoCheckStarted;
         private bool _updateNotified;
 
-        public string AppVersion { get; } = GetAppVersion();
+        public string AppVersion { get; } = $"v{GetAppVersion()}";
         public string AppName => "TAY Optimizer";
 
         private SettingsViewModel()
@@ -201,10 +201,16 @@ namespace TAY.ViewModels
             try
             {
                 var safeVersion = string.IsNullOrWhiteSpace(LatestVersion) ? "latest" : LatestVersion.Replace("/", "-");
-                var targetPath = Path.Combine(Path.GetTempPath(), $"TAY_Setup_{safeVersion}.exe");
+                var targetPath = Path.Combine(
+                    Path.GetTempPath(),
+                    $"TAY_Setup_{safeVersion}_{DateTime.UtcNow:yyyyMMddHHmmss}.exe");
 
                 using var response = await Http.GetAsync(DownloadUrl, HttpCompletionOption.ResponseHeadersRead);
-                response.EnsureSuccessStatusCode();
+                if (!response.IsSuccessStatusCode)
+                {
+                    UpdateStatus = $"download failed ({(int)response.StatusCode})";
+                    return;
+                }
 
                 await using var input = await response.Content.ReadAsStreamAsync();
                 await using var output = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.None);
@@ -217,9 +223,23 @@ namespace TAY.ViewModels
                     UseShellExecute = true
                 });
             }
-            catch
+            catch (HttpRequestException ex)
             {
-                UpdateStatus = "download failed";
+                UpdateStatus = ex.StatusCode.HasValue
+                    ? $"download failed ({(int)ex.StatusCode.Value})"
+                    : $"download failed: {ex.Message}";
+            }
+            catch (IOException ex)
+            {
+                UpdateStatus = $"download failed: {ex.Message}";
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                UpdateStatus = $"download failed: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                UpdateStatus = $"download failed: {ex.Message}";
             }
             finally
             {
