@@ -15,13 +15,19 @@ namespace TAY.ViewModels
         private string totalSize = "0 MB";
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(IsNotScanning))]
+        [NotifyPropertyChangedFor(nameof(IsNotBusy))]
+        [NotifyPropertyChangedFor(nameof(ScanButtonText))]
         private bool isScanning = false;
 
-        public bool IsNotScanning => !IsScanning;
-
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsNotBusy))]
+        [NotifyPropertyChangedFor(nameof(CleanButtonText))]
         private bool isCleaning = false;
+
+        public bool IsNotBusy => !IsScanning && !IsCleaning;
+
+        public string ScanButtonText => IsScanning ? "[ scanning... ]" : "[ scan_system ]";
+        public string CleanButtonText => IsCleaning ? "[ cleaning... ]" : "[ clean_selected ]";
 
         private readonly Microsoft.UI.Dispatching.DispatcherQueue _dispatcher;
         public CleanerViewModel()

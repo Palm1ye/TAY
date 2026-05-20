@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml.Controls;
 using System;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using TAY.ViewModels;
 
@@ -8,6 +9,7 @@ namespace TAY.Views
     public sealed partial class DashboardView : Page
     {
         public DashboardViewModel ViewModel { get; }
+        private bool _quickBoostRunning = false;
 
         public DashboardView()
         {
@@ -46,65 +48,130 @@ namespace TAY.Views
         [System.Runtime.InteropServices.DllImport("psapi.dll", SetLastError = true)]
         private static extern bool EmptyWorkingSet(IntPtr hProcess);
 
-        private void QuickBoost_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        private async void QuickBoost_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
+            if (_quickBoostRunning) return;
+            _quickBoostRunning = true;
+
             QuickBoostBtn.IsEnabled = false;
             QuickBoostBtn.Content = "[ boosting... ]";
 
-            System.Threading.Tasks.Task.Run(() =>
+            QuickBoostDialog.XamlRoot = this.XamlRoot;
+            QuickBoostDialog.IsPrimaryButtonEnabled = false;
+            QuickBoostRing.IsActive = true;
+            QuickBoostStatusText.Text = "Boosting...";
+            QuickBoostSummaryText.Text = "";
+            QuickBoostStep1.Text = "[ ... ] Sweeping managed heap";
+            QuickBoostStep2.Text = "[ ... ] Trimming working sets";
+            QuickBoostStep3.Text = "[ ... ] Finalizing report";
+            _ = QuickBoostDialog.ShowAsync();
+
+            QuickBoostReport report;
+            try
             {
-                long clearedBytes = 0;
-                try
+                report = await Task.Run(() =>
                 {
-                    // Force Garbage Collection
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-
-                    // Empty working set of all processes
-                    foreach (var process in System.Diagnostics.Process.GetProcesses())
+                    var localReport = new QuickBoostReport();
+                    try
                     {
-                        try
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        localReport.ManagedSweep = true;
+
+                        this.DispatcherQueue.TryEnqueue(() =>
                         {
-                            long wsBefore = process.WorkingSet64;
-                            bool success = EmptyWorkingSet(process.Handle);
-                            long wsAfter = process.WorkingSet64;
-                            if (success && wsBefore > wsAfter)
+                            QuickBoostStep1.Text = "[ ok ] Sweeping managed heap";
+                            QuickBoostStep2.Text = "[ ... ] Trimming working sets";
+                        });
+
+                        var processes = System.Diagnostics.Process.GetProcesses();
+                        localReport.ProcessesScanned = processes.Length;
+
+                        foreach (var process in processes)
+                        {
+                            try
                             {
-                                clearedBytes += (wsBefore - wsAfter);
+                                long wsBefore = process.WorkingSet64;
+                                bool success = EmptyWorkingSet(process.Handle);
+                                long wsAfter = process.WorkingSet64;
+                                if (success && wsBefore > wsAfter)
+                                {
+                                    localReport.ProcessesTrimmed++;
+                                    localReport.ClearedBytes += (wsBefore - wsAfter);
+                                }
                             }
+                            catch { }
                         }
-                        catch { }
-                    }
-                }
-                catch { }
 
-                double clearedMB = clearedBytes / (1024.0 * 1024);
-
-                this.DispatcherQueue.TryEnqueue(() =>
-                {
-                    if (clearedMB > 10)
-                    {
-                        QuickBoostBtn.Content = $"[ cleared {clearedMB:F0} MB! ]";
+                        this.DispatcherQueue.TryEnqueue(() =>
+                        {
+                            QuickBoostStep2.Text = "[ ok ] Trimming working sets";
+                            QuickBoostStep3.Text = "[ ... ] Finalizing report";
+                        });
                     }
-                    else
-                    {
-                        QuickBoostBtn.Content = "[ system peak! ]";
-                    }
+                    catch { }
 
-                    // Reset after 3 seconds
-                    var resetTimer = new Microsoft.UI.Xaml.DispatcherTimer
+                    this.DispatcherQueue.TryEnqueue(() =>
                     {
-                        Interval = TimeSpan.FromSeconds(3)
-                    };
-                    resetTimer.Tick += (s, ev) =>
-                    {
-                        resetTimer.Stop();
-                        QuickBoostBtn.Content = "[ quick_boost ]";
-                        QuickBoostBtn.IsEnabled = true;
-                    };
-                    resetTimer.Start();
+                        QuickBoostStep3.Text = "[ ok ] Finalizing report";
+                    });
+
+                    return localReport;
                 });
+            }
+            catch
+            {
+                QuickBoostBtn.Content = "[ quick_boost ]";
+                QuickBoostBtn.IsEnabled = true;
+                _quickBoostRunning = false;
+                return;
+            }
+
+            double clearedMB = report.ClearedBytes / (1024.0 * 1024);
+
+            this.DispatcherQueue.TryEnqueue(() =>
+            {
+                QuickBoostRing.IsActive = false;
+                QuickBoostStatusText.Text = "Boost complete";
+                QuickBoostSummaryText.Text = $"Cleared {clearedMB:F0} MB from {report.ProcessesTrimmed}/{report.ProcessesScanned} processes.";
+                QuickBoostDialog.IsPrimaryButtonEnabled = true;
             });
+
+            await Task.Delay(1200);
+            try { QuickBoostDialog.Hide(); } catch { }
+
+            this.DispatcherQueue.TryEnqueue(() =>
+            {
+                if (clearedMB > 10)
+                {
+                    QuickBoostBtn.Content = $"[ cleared {clearedMB:F0} MB! ]";
+                }
+                else
+                {
+                    QuickBoostBtn.Content = "[ system peak! ]";
+                }
+
+                var resetTimer = new Microsoft.UI.Xaml.DispatcherTimer
+                {
+                    Interval = TimeSpan.FromSeconds(3)
+                };
+                resetTimer.Tick += (s, ev) =>
+                {
+                    resetTimer.Stop();
+                    QuickBoostBtn.Content = "[ quick_boost ]";
+                    QuickBoostBtn.IsEnabled = true;
+                    _quickBoostRunning = false;
+                };
+                resetTimer.Start();
+            });
+        }
+
+        private sealed class QuickBoostReport
+        {
+            public bool ManagedSweep { get; set; }
+            public long ClearedBytes { get; set; }
+            public int ProcessesScanned { get; set; }
+            public int ProcessesTrimmed { get; set; }
         }
     }
 }

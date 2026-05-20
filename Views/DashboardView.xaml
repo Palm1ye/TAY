@@ -231,5 +231,25 @@
                 </Grid>
             </Border>
         </Grid>
+
+        <ContentDialog
+            x:Name="QuickBoostDialog"
+            Title="Quick Boost"
+            PrimaryButtonText="Close"
+            IsPrimaryButtonEnabled="False"
+            DefaultButton="Primary">
+            <StackPanel Spacing="12">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <ProgressRing x:Name="QuickBoostRing" IsActive="True" Width="22" Height="22" Foreground="{StaticResource AccentMain}"/>
+                    <TextBlock x:Name="QuickBoostStatusText" Text="Initializing..." FontFamily="Consolas" FontSize="12" Foreground="{StaticResource TextMain}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Spacing="6">
+                    <TextBlock x:Name="QuickBoostStep1" Text="[ ... ] Sweeping managed heap" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock x:Name="QuickBoostStep2" Text="[ ... ] Trimming working sets" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock x:Name="QuickBoostStep3" Text="[ ... ] Finalizing report" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextMuted}"/>
+                </StackPanel>
+                <TextBlock x:Name="QuickBoostSummaryText" Text="" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextDim}"/>
+            </StackPanel>
+        </ContentDialog>
     </Grid>
 </Page>

@@ -92,11 +92,16 @@
                         <Button Content="[ clear_all ]" Style="{StaticResource OutlineButton}" Click="ClearAll_Click" Grid.Column="1" Margin="8,0,0,0"/>
                     </Grid>
 
+                    <StackPanel Margin="0,0,0,12" Visibility="{x:Bind ViewModel.IsCleaning, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <TextBlock Text="cleaning_in_progress" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource AccentDanger}"/>
+                        <ProgressBar IsIndeterminate="True" Height="2" Foreground="{StaticResource AccentDanger}" Background="#20F47C7C"/>
+                    </StackPanel>
+
                     <!-- Primary Action Button -->
-                    <Button Content="[ scan_system ]" Command="{x:Bind ViewModel.ScanCommand}" IsEnabled="{x:Bind ViewModel.IsNotScanning, Mode=OneWay}" Style="{StaticResource SweetButton}" HorizontalAlignment="Stretch" Margin="0,0,0,12"/>
+                    <Button Content="{x:Bind ViewModel.ScanButtonText, Mode=OneWay}" Command="{x:Bind ViewModel.ScanCommand}" IsEnabled="{x:Bind ViewModel.IsNotBusy, Mode=OneWay}" Style="{StaticResource SweetButton}" HorizontalAlignment="Stretch" Margin="0,0,0,12"/>
                     
                     <!-- Outlined/Soft Destructive Reclaim Button -->
-                    <Button Content="[ clean_selected ]" Command="{x:Bind ViewModel.CleanCommand}" IsEnabled="{x:Bind ViewModel.IsNotScanning, Mode=OneWay}" Style="{StaticResource DestructiveOutlineButton}" HorizontalAlignment="Stretch"/>
+                    <Button Content="{x:Bind ViewModel.CleanButtonText, Mode=OneWay}" Command="{x:Bind ViewModel.CleanCommand}" IsEnabled="{x:Bind ViewModel.IsNotBusy, Mode=OneWay}" Style="{StaticResource DestructiveOutlineButton}" HorizontalAlignment="Stretch"/>
                 </StackPanel>
             </Border>
         </Grid>

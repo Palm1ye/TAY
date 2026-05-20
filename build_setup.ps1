@@ -12,7 +12,7 @@ Write-Host "Checking for active TAY processes..." -ForegroundColor Cyan
 Get-Process -Name "TAY" -ErrorAction SilentlyContinue | Stop-Process -Force
 
 # Step 1: Clean build and publish folders to prevent size bloat
-Write-Host "`n[1/3] Cleaning stale files and publishing framework-dependent release..." -ForegroundColor Yellow
+Write-Host "`n[1/3] Cleaning stale files and publishing self-contained release..." -ForegroundColor Yellow
 $publishDir = Join-Path $PSScriptRoot "bin\x64\Release\net8.0-windows10.0.19041.0\win-x64\publish\"
 if (Test-Path $publishDir) {
     Write-Host "Deleting stale publish folder: $publishDir" -ForegroundColor Cyan
@@ -23,7 +23,7 @@ Write-Host "Running dotnet clean..." -ForegroundColor Cyan
 dotnet clean -c Release -r win-x64 -p:Platform=x64
 
 Write-Host "Running dotnet publish..." -ForegroundColor Cyan
-dotnet publish -c Release -r win-x64 -p:Platform=x64 --self-contained false
+dotnet publish -c Release -r win-x64 -p:Platform=x64 --self-contained true
 
 # Step 2: Resolve ISCC.exe (Inno Setup Compiler)
 Write-Host "`n[2/3] Resolving Inno Setup Compiler (ISCC.exe)..." -ForegroundColor Yellow
