@@ -1,5 +1,5 @@
-; TAY System Optimizer - Inno Setup Script
-; Version: 0.1.1.2 (synced by tools/set_version.ps1)
+﻿; TAY System Optimizer - Inno Setup Script
+; Version: 0.1.1.2
 
 #define MyAppName "TAY System Optimizer"
 #define MyAppVersion "0.1.1.2"
@@ -46,3 +46,4 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilen
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+
