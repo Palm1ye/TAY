@@ -1,0 +1,51 @@
+name: Build and Release TAY
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Installer and Publish Release
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build and Package with Inno Setup
+        shell: powershell
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force
+          ./build_setup.ps1
+
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Output/TAY_Setup.exe
+          name: TAY System Optimizer Release ${{ github.ref_name }}
+          body: |
+            ## TAY System Optimizer - Release ${{ github.ref_name }}
+            
+            Welcome to the new release of TAY System Optimizer!
+            
+            ### Installation Instructions
+            1. Download `TAY_Setup.exe` below.
+            2. Run the installer and follow the instructions.
+            3. Enjoy a faster and more optimized Windows experience!
+            
+            *Thanks for using TAY! Developed by @Palm1ye.*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
