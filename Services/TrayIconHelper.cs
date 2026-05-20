@@ -36,11 +36,13 @@ namespace TAY.Services
         }
 
         private const int NIM_ADD = 0x00000000;
+        private const int NIM_MODIFY = 0x00000001;
         private const int NIM_DELETE = 0x00000002;
         
         private const int NIF_MESSAGE = 0x00000001;
         private const int NIF_ICON = 0x00000002;
         private const int NIF_TIP = 0x00000004;
+        private const int NIF_INFO = 0x00000010;
 
         private const int WM_USER = 0x0400;
         public const int WM_TRAYICON = WM_USER + 120;
@@ -53,6 +55,8 @@ namespace TAY.Services
         private const int IDI_SHIELD = 32518; // Default Windows Shield Icon
         private const uint IMAGE_ICON = 1;
         private const uint LR_LOADFROMFILE = 0x00000010;
+
+        private const int NIIF_INFO = 0x00000001;
 
         private const uint MF_STRING = 0x00000000;
         private const uint MF_SEPARATOR = 0x00000800;
@@ -228,6 +232,17 @@ namespace TAY.Services
                 RemoveWindowSubclass(_hWnd, _newWndProc, (IntPtr)101);
             }
             _active = false;
+        }
+
+        public static void ShowBalloon(string title, string message)
+        {
+            if (!_active) return;
+
+            _nid.uFlags = NIF_INFO;
+            _nid.szInfoTitle = title;
+            _nid.szInfo = message;
+            _nid.dwInfoFlags = NIIF_INFO;
+            Shell_NotifyIconW(NIM_MODIFY, ref _nid);
         }
     }
 }

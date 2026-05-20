@@ -33,7 +33,7 @@
         </Grid>
 
         <!-- Settings Bento Box Card -->
-        <StackPanel Grid.Row="1">
+        <StackPanel Grid.Row="1" Spacing="12">
             <Border Style="{StaticResource SweetCard}">
                 <StackPanel Spacing="16">
                     <TextBlock Text="// APP CONFIG DUMP" FontFamily="Consolas" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextMuted}" CharacterSpacing="80" Margin="0,0,0,8"/>
@@ -67,6 +67,45 @@
                         <TextBlock Text="SYS // APP_CHANNEL   :" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMuted}" Grid.Column="0"/>
                         <TextBlock Text="stable_terminal" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource AccentWarning}" FontWeight="Bold" Grid.Column="1"/>
                     </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource SweetCard}">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="// UPDATE CONTROL" FontFamily="Consolas" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextMuted}" CharacterSpacing="80" Margin="0,0,0,8"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="SYS // CURRENT       :" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMuted}" Grid.Column="0"/>
+                        <TextBlock Text="{x:Bind ViewModel.AppVersion}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMain}" FontWeight="Bold" Grid.Column="1"/>
+                    </Grid>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="SYS // LATEST        :" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMuted}" Grid.Column="0"/>
+                        <TextBlock Text="{x:Bind ViewModel.LatestVersion, Mode=OneWay}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource AccentMain}" FontWeight="Bold" Grid.Column="1"/>
+                    </Grid>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="SYS // STATUS        :" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMuted}" Grid.Column="0"/>
+                        <TextBlock Text="{x:Bind ViewModel.UpdateStatus, Mode=OneWay}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextDim}" Grid.Column="1"/>
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="[ check_updates ]" Style="{StaticResource OutlineButton}" Command="{x:Bind ViewModel.CheckUpdatesCommand}" IsEnabled="{x:Bind ViewModel.IsNotChecking, Mode=OneWay}"/>
+                        <Button Content="[ download_update ]" Style="{StaticResource SweetButton}" Command="{x:Bind ViewModel.DownloadUpdateCommand}" IsEnabled="{x:Bind ViewModel.CanDownloadUpdate, Mode=OneWay}" Visibility="{x:Bind ViewModel.IsUpdateAvailable, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        <Button Content="[ release_page ]" Style="{StaticResource OutlineButton}" Command="{x:Bind ViewModel.OpenReleasePageCommand}"/>
+                    </StackPanel>
                 </StackPanel>
             </Border>
         </StackPanel>

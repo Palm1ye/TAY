@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using System;
 using System.Runtime.InteropServices;
 using TAY.Services;
+using TAY.ViewModels;
 using TAY.Views;
 
 namespace TAY
@@ -39,6 +40,8 @@ namespace TAY
             m_window = new MainWindow();
             m_window.Closed += (s, e) => { ExitApplication(); };
             m_window.Activate();
+
+            SettingsViewModel.Instance.BeginAutoCheck();
 
             try
             {

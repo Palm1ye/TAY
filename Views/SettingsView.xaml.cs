@@ -12,7 +12,7 @@ namespace TAY.Views
 
         public SettingsView()
         {
-            ViewModel = new SettingsViewModel();
+            ViewModel = SettingsViewModel.Instance;
             this.InitializeComponent();
         }
 
