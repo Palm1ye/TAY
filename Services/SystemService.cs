@@ -234,10 +234,11 @@ public class SystemService
                             22 => "DDR2 FB-DIMM",
                             24 => "DDR3",
                             26 => "DDR4",
-                            30 => "DDR5",
+                            30 => "LPDDR5",
                             31 => "LPDDR3",
                             32 => "LPDDR4",
-                            33 => "LPDDR5",
+                            33 => "DDR5",
+                            34 => "DDR5",
                             _ => ramType
                         };
                     }
