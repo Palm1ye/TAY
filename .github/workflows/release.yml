@@ -33,7 +33,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: Output/TAY_Setup.exe
-          name: TAY System Optimizer Release ${{ github.ref_name }}
+          name: New Release ${{ github.ref_name }}
           body: |
             ## TAY System Optimizer - Release ${{ github.ref_name }}
             
@@ -44,7 +44,7 @@ jobs:
             2. Run the installer and follow the instructions.
             3. Enjoy a faster and more optimized Windows experience!
             
-            *Thanks for using TAY! Developed by @Palm1ye.*
+            *Thanks for using TAY!*
           draft: false
           prerelease: false
         env:

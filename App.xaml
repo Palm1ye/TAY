@@ -15,17 +15,17 @@
             <SolidColorBrush x:Key="WindowCaptionBackground" Color="Transparent"/>
             <SolidColorBrush x:Key="WindowCaptionBackgroundDisabled" Color="Transparent"/>
 
-            <SolidColorBrush x:Key="BgBase" Color="#05070A" />
-            <SolidColorBrush x:Key="BgSidebar" Color="#080D14" />
-            <SolidColorBrush x:Key="AccentMain" Color="#4AEADC" />
+            <SolidColorBrush x:Key="BgBase" Color="#080B10" />
+            <SolidColorBrush x:Key="BgSidebar" Color="#090D13" />
+            <SolidColorBrush x:Key="AccentMain" Color="#58D5C9" />
             <SolidColorBrush x:Key="AccentWarning" Color="#F2C66D" />
             <SolidColorBrush x:Key="AccentDanger" Color="#F47C7C" />
-            <SolidColorBrush x:Key="AccentInfo" Color="#3B9FFF" />
+            <SolidColorBrush x:Key="AccentInfo" Color="#7AA7FF" />
             <SolidColorBrush x:Key="TextMain" Color="#F4F4F5" />
             <SolidColorBrush x:Key="TextDim" Color="#A1A1AA" />
             <SolidColorBrush x:Key="TextMuted" Color="#71717A" />
-            <SolidColorBrush x:Key="CardBg" Color="#0D1117" />
-            <SolidColorBrush x:Key="CardBorder" Color="#1FFFFFFF" />
+            <SolidColorBrush x:Key="CardBg" Color="#D911151C" />
+            <SolidColorBrush x:Key="CardBorder" Color="#2CFFFFFF" />
 
             <SolidColorBrush x:Key="ToggleSwitchFillOn" Color="#4AEADC" />
             <SolidColorBrush x:Key="ToggleSwitchFillOnPointerOver" Color="#5CF0E6" />
@@ -97,12 +97,15 @@
                             <VisualState x:Name="Normal"/>
                             <VisualState x:Name="PointerOver">
                                 <VisualState.Setters>
-                                    <Setter Target="Root.Opacity" Value="0.9"/>
+                                    <Setter Target="Root.BorderBrush" Value="#516476"/>
+                                    <Setter Target="Root.Opacity" Value="1"/>
                                 </VisualState.Setters>
                             </VisualState>
                             <VisualState x:Name="Pressed">
                                 <VisualState.Setters>
-                                    <Setter Target="Root.Opacity" Value="0.78"/>
+                                    <Setter Target="Root.Background" Value="#263141"/>
+                                    <Setter Target="Root.BorderBrush" Value="#6658D5C9"/>
+                                    <Setter Target="Root.Opacity" Value="0.92"/>
                                 </VisualState.Setters>
                             </VisualState>
                             <VisualState x:Name="Disabled">
@@ -117,11 +120,11 @@
 
             <Style x:Key="SweetCard" TargetType="Border">
                 <Setter Property="Background" Value="{StaticResource CardBg}"/>
-                <Setter Property="CornerRadius" Value="8"/>
-                <Setter Property="Padding" Value="20"/>
+                <Setter Property="CornerRadius" Value="6"/>
+                <Setter Property="Padding" Value="14"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="BorderBrush" Value="{StaticResource CardBorder}"/>
-                <Setter Property="Margin" Value="4"/>
+                <Setter Property="Margin" Value="3"/>
             </Style>
 
             <Style x:Key="SweetButton" TargetType="Button">
@@ -130,20 +133,21 @@
                 <Setter Property="FontFamily" Value="Segoe UI"/>
                 <Setter Property="FontWeight" Value="SemiBold"/>
                 <Setter Property="FontSize" Value="12"/>
-                <Setter Property="Padding" Value="18,8"/>
+                <Setter Property="Padding" Value="14,7"/>
                 <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="CornerRadius" Value="6"/>
+                <Setter Property="CornerRadius" Value="5"/>
                 <Setter Property="Template" Value="{StaticResource FlatButtonTemplate}"/>
             </Style>
 
             <Style x:Key="OutlineButton" TargetType="Button">
-                <Setter Property="Background" Value="#10FFFFFF"/>
+                <Setter Property="Background" Value="#18202A"/>
                 <Setter Property="Foreground" Value="{StaticResource TextMain}"/>
                 <Setter Property="FontFamily" Value="Segoe UI"/>
                 <Setter Property="FontSize" Value="12"/>
-                <Setter Property="Padding" Value="18,8"/>
-                <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="CornerRadius" Value="6"/>
+                <Setter Property="Padding" Value="14,7"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="BorderBrush" Value="#334354"/>
+                <Setter Property="CornerRadius" Value="5"/>
                 <Setter Property="Template" Value="{StaticResource FlatButtonTemplate}"/>
             </Style>
 
@@ -153,26 +157,34 @@
                 <Setter Property="FontFamily" Value="Segoe UI"/>
                 <Setter Property="FontWeight" Value="SemiBold"/>
                 <Setter Property="FontSize" Value="12"/>
-                <Setter Property="Padding" Value="14,6"/>
-                <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="CornerRadius" Value="6"/>
+                <Setter Property="Padding" Value="12,6"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="BorderBrush" Value="#30F47C7C"/>
+                <Setter Property="CornerRadius" Value="5"/>
                 <Setter Property="Template" Value="{StaticResource FlatButtonTemplate}"/>
             </Style>
 
             <Style x:Key="GhostButton" TargetType="Button">
-                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Background" Value="#00FFFFFF"/>
                 <Setter Property="Foreground" Value="{StaticResource TextDim}"/>
                 <Setter Property="FontFamily" Value="Segoe UI"/>
                 <Setter Property="FontSize" Value="12"/>
-                <Setter Property="Padding" Value="14,7"/>
+                <Setter Property="Padding" Value="10,5"/>
                 <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="CornerRadius" Value="6"/>
+                <Setter Property="CornerRadius" Value="5"/>
                 <Setter Property="Template" Value="{StaticResource FlatButtonTemplate}"/>
             </Style>
 
-            <SolidColorBrush x:Key="RowBg" Color="#111827" />
-            <SolidColorBrush x:Key="RowBgAlt" Color="#0B1018" />
-            <SolidColorBrush x:Key="RowBorder" Color="#17FFFFFF" />
+            <Style x:Key="ToolButton" TargetType="Button" BasedOn="{StaticResource OutlineButton}">
+                <Setter Property="Padding" Value="12,10"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                <Setter Property="MinHeight" Value="48"/>
+            </Style>
+
+            <SolidColorBrush x:Key="RowBg" Color="#171E27" />
+            <SolidColorBrush x:Key="RowBgAlt" Color="#0D1218" />
+            <SolidColorBrush x:Key="RowBorder" Color="#24FFFFFF" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

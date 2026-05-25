@@ -24,6 +24,9 @@ namespace TAY.ViewModels
         private bool isRamCleaning;
 
         [ObservableProperty]
+        private bool isRamPanelVisible;
+
+        [ObservableProperty]
         private bool isNetworkCleaning;
 
         [ObservableProperty]
@@ -54,10 +57,23 @@ namespace TAY.ViewModels
         public string ExpectedMemoryBoost => "Best for stutter recovery: frees cache/working sets, but does not increase raw FPS by itself.";
         public string ExpectedNetworkBoost => "Latency impact: usually 0-20 ms depending on DNS path and adapter state.";
         public string BoostGuidance => "Use Game Focus for CPU-bound games, Memory Sweep after long sessions, and Network tools only when latency or DNS feels unstable.";
+        public string SupportedGamesSummary => "CS2, Dota 2, Rocket League, GTA V, Cyberpunk 2077, Valorant, Fortnite, League of Legends, Overwatch";
 
         public ObservableCollection<DnsOption> DnsResults { get; } = new();
         public ObservableCollection<ContextMenuItem> ContextHandlers { get; } = new();
         public ObservableCollection<DriverInfo> Drivers { get; } = new();
+        public ObservableCollection<SupportedGameVM> SupportedGames { get; } = new()
+        {
+            new("Counter-Strike 2", "cs2.exe"),
+            new("Dota 2", "dota2.exe"),
+            new("Rocket League", "RocketLeague.exe"),
+            new("GTA V", "GTA5.exe"),
+            new("Cyberpunk 2077", "Cyberpunk2077.exe"),
+            new("Valorant", "VALORANT-Win64-Shipping.exe"),
+            new("Fortnite", "FortniteClient-Win64-Shipping.exe"),
+            new("League of Legends", "League of Legends.exe"),
+            new("Overwatch", "Overwatch.exe")
+        };
 
         private DnsOption? _recommendedDns;
 
@@ -148,6 +164,7 @@ namespace TAY.ViewModels
         {
             if (IsRamCleaning) return;
             IsRamCleaning = true;
+            IsRamPanelVisible = true;
             RamCleanLog = ">> INITIALIZING CORE MEMORY SWEEP PROTOCOL...\n";
             try
             {
@@ -191,6 +208,13 @@ namespace TAY.ViewModels
             {
                 IsRamCleaning = false;
             }
+        }
+
+        [RelayCommand]
+        private void DismissRamResult()
+        {
+            if (IsRamCleaning) return;
+            IsRamPanelVisible = false;
         }
 
         [RelayCommand]
@@ -461,4 +485,6 @@ namespace TAY.ViewModels
             }
         }
     }
+
+    public record SupportedGameVM(string Name, string ProcessName);
 }

@@ -14,7 +14,7 @@
         </TransitionCollection>
     </Page.Transitions>
 
-    <Grid Margin="30,20,30,30">
+    <Grid Margin="24,16,24,24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -22,37 +22,46 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Page Header -->
-        <StackPanel Margin="4,0,4,16">
-            <TextBlock Text="Active processes and memory usage" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
-            <TextBlock Text="Processes" FontFamily="Segoe UI" FontSize="28" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,2,0,0"/>
-        </StackPanel>
+        <Grid Margin="3,0,3,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Active processes and memory usage" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
+                <TextBlock Text="Processes" FontFamily="Segoe UI" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,1,0,0"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Button Content="Refresh" Command="{x:Bind ViewModel.LoadProcessesCommand}" IsEnabled="{x:Bind ViewModel.IsNotRefreshing, Mode=OneWay}" Style="{StaticResource SweetButton}"/>
+                <Button Content="Copy List" Style="{StaticResource OutlineButton}" Click="CopyProcessList_Click"/>
+            </StackPanel>
+        </Grid>
 
-        <!-- Command Line Toolbar (Primary Action) -->
-        <Border Style="{StaticResource SweetCard}" Grid.Row="1" Margin="4,0,4,16" Padding="16,10">
-            <Grid>
+        <Border Style="{StaticResource SweetCard}" Grid.Row="1" Margin="3,0,3,12" Padding="12,9">
+            <Grid ColumnSpacing="10">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="190"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="220"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel Orientation="Horizontal" Grid.Column="0" Spacing="12">
-                    <Button Content="Refresh" Command="{x:Bind ViewModel.LoadProcessesCommand}" IsEnabled="{x:Bind ViewModel.IsNotRefreshing, Mode=OneWay}" Style="{StaticResource SweetButton}"/>
+                <TextBox Grid.Column="0"
+                         PlaceholderText="Search process..."
+                         Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         VerticalAlignment="Center"
+                         CornerRadius="5"
+                         BorderThickness="1"
+                         BorderBrush="{StaticResource RowBorder}"
+                         Background="{StaticResource RowBg}"
+                         Foreground="{StaticResource TextMain}"
+                         PlaceholderForeground="{StaticResource TextMuted}"
+                         FontFamily="Segoe UI"
+                         FontSize="12"
+                         Height="34"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                     <ProgressRing IsActive="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}" Width="18" Height="18" Foreground="{StaticResource AccentMain}" VerticalAlignment="Center"/>
-                    <Button Content="Copy List" Style="{StaticResource OutlineButton}" Click="CopyProcessList_Click"/>
+                    <TextBlock Text="{x:Bind ViewModel.OperationStatus, Mode=OneWay}" FontFamily="Segoe UI" FontSize="11" Foreground="{StaticResource TextDim}" VerticalAlignment="Center" MaxWidth="360" TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
-
-                <TextBlock Grid.Column="1"
-                           Text="{x:Bind ViewModel.OperationStatus, Mode=OneWay}"
-                           FontFamily="Segoe UI"
-                           FontSize="11"
-                           Foreground="{StaticResource TextDim}"
-                           VerticalAlignment="Center"
-                           Margin="12,0,0,0"/>
-                
-                <TextBox Grid.Column="2" Width="300" HorizontalAlignment="Right" PlaceholderText="Search process..." Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" CornerRadius="4" BorderThickness="1" BorderBrush="{StaticResource RowBorder}" Background="{StaticResource RowBg}" Foreground="{StaticResource TextMain}" FontFamily="Segoe UI" FontSize="12" Height="32"/>
-                <ComboBox Grid.Column="3" ItemsSource="{x:Bind ViewModel.SortOptions}" SelectedItem="{x:Bind ViewModel.SelectedSort, Mode=TwoWay}" Height="32" Margin="10,0,0,0" Background="{StaticResource RowBg}" BorderBrush="{StaticResource RowBorder}" Foreground="{StaticResource TextMain}"/>
+                <ComboBox Grid.Column="2" ItemsSource="{x:Bind ViewModel.SortOptions}" SelectedItem="{x:Bind ViewModel.SelectedSort, Mode=TwoWay}" Height="34" Background="{StaticResource RowBg}" BorderBrush="{StaticResource RowBorder}" Foreground="{StaticResource TextMain}"/>
             </Grid>
         </Border>
 
@@ -73,7 +82,7 @@
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="viewmodels:ProcessItemVM">
                     <!-- Flat console output row -->
-                    <Border Background="{StaticResource RowBg}" CornerRadius="4" Padding="12,3" Margin="4,0,4,3" BorderThickness="1" BorderBrush="{StaticResource RowBorder}">
+                    <Border Background="{StaticResource RowBg}" CornerRadius="4" Padding="10,3" Margin="3,0,3,3" BorderThickness="1" BorderBrush="{StaticResource RowBorder}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2*"/>

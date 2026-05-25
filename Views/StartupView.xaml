@@ -14,7 +14,7 @@
         </TransitionCollection>
     </Page.Transitions>
 
-    <Grid Margin="30,20,30,30">
+    <Grid Margin="24,16,24,24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -23,14 +23,14 @@
         </Grid.RowDefinitions>
 
         <!-- Page Header -->
-        <Grid Margin="4,0,4,16">
+        <Grid Margin="3,0,3,12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0">
                 <TextBlock Text="Boot behavior and launch impact" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
-                <TextBlock Text="Startup" FontFamily="Segoe UI" FontSize="28" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,2,0,0"/>
+                <TextBlock Text="Startup" FontFamily="Segoe UI" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,1,0,0"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                 <Button Content="Enable All" Style="{StaticResource OutlineButton}" Click="EnableAll_Click"/>
@@ -38,7 +38,7 @@
             </StackPanel>
         </Grid>
 
-        <Border Grid.Row="1" Style="{StaticResource SweetCard}" Padding="16,12" Margin="4,0,4,14">
+        <Border Grid.Row="1" Style="{StaticResource SweetCard}" Padding="12,9" Margin="3,0,3,12">
             <Grid ColumnSpacing="12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -72,7 +72,7 @@
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="viewmodels:StartupAppVM">
                     <!-- Dense Console output row -->
-                    <Border Background="{StaticResource RowBg}" CornerRadius="4" Padding="12,4" Margin="4,0,4,3" BorderThickness="1" BorderBrush="{StaticResource RowBorder}">
+                    <Border Background="{StaticResource RowBg}" CornerRadius="4" Padding="10,3" Margin="3,0,3,3" BorderThickness="1" BorderBrush="{StaticResource RowBorder}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2*"/>
@@ -92,7 +92,7 @@
                             </StackPanel>
                             
                             <!-- Column 1: Impact level -->
-                            <Border Grid.Column="1" Background="#14FFFFFF" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="10" Padding="10,3" HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <Border Grid.Column="1" Background="#14FFFFFF" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="6" Padding="10,3" HorizontalAlignment="Left" VerticalAlignment="Center">
                                 <TextBlock Text="{x:Bind Impact}" FontFamily="Segoe UI" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentWarning}"/>
                             </Border>
                             

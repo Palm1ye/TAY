@@ -67,6 +67,42 @@ namespace TAY.ViewModels
         private string motherboardModel = "...";
 
         [ObservableProperty]
+        private string cpuStatus = "Waiting for sample";
+
+        [ObservableProperty]
+        private string ramStatus = "Waiting for sample";
+
+        [ObservableProperty]
+        private string storageStatus = "Waiting for sample";
+
+        [ObservableProperty]
+        private string processStatus = "Waiting for sample";
+
+        [ObservableProperty]
+        private string diagnosisTitle = "Waiting for telemetry";
+
+        [ObservableProperty]
+        private string diagnosisDetail = "Live CPU, memory, storage, and process data will select the most useful tool here.";
+
+        [ObservableProperty]
+        private string diagnosisSignal = "Thresholds: RAM 85%, storage 88%, CPU 80%, processes 220+";
+
+        [ObservableProperty]
+        private string diagnosisActionText = "Open Dashboard";
+
+        [ObservableProperty]
+        private string diagnosisRoute = "Dashboard";
+
+        [ObservableProperty]
+        private string memoryPressureStatus = "Pending";
+
+        [ObservableProperty]
+        private string storagePressureStatus = "Pending";
+
+        [ObservableProperty]
+        private string backgroundLoadStatus = "Pending";
+
+        [ObservableProperty]
         private ISeries[] cpuSeries = Array.Empty<ISeries>();
 
         public Axis[] XAxes { get; set; } = new Axis[]
@@ -245,6 +281,8 @@ namespace TAY.ViewModels
                     CpuSeries[1].Values = _ramHistory;
                     CpuSeries[2].Values = _gpuHistory;
 
+                    UpdateDashboardSignals(cpu, ram.percent, storage.percent, processes);
+
                     OnPropertyChanged(nameof(CpuSeries));
                 });
             }
@@ -252,6 +290,73 @@ namespace TAY.ViewModels
             finally
             {
                 _isUpdating = false;
+            }
+        }
+
+        private void UpdateDashboardSignals(double cpu, double ram, double storage, int processes)
+        {
+            CpuStatus = cpu >= 80 ? "High load" : cpu >= 60 ? "Moderate" : "Normal";
+            RamStatus = ram >= 85 ? "Action needed" : ram >= 70 ? "Watch" : "Normal";
+            StorageStatus = storage >= 88 ? "Cleanup advised" : storage >= 80 ? "Review soon" : "Enough free space";
+            ProcessStatus = processes >= 220 ? "Review processes" : processes >= 170 ? "Busy" : "Normal";
+
+            MemoryPressureStatus = ram >= 85
+                ? "High pressure"
+                : ram >= 70
+                    ? "Elevated"
+                    : "Healthy";
+
+            StoragePressureStatus = storage >= 90
+                ? "Critical capacity"
+                : storage >= 80
+                    ? "Review storage"
+                    : "Enough headroom";
+
+            BackgroundLoadStatus = processes >= 220
+                ? "Busy process table"
+                : processes >= 170
+                    ? "Moderate background load"
+                    : "Normal";
+
+            if (ram >= 85)
+            {
+                DiagnosisTitle = "Memory pressure detected";
+                DiagnosisDetail = $"RAM is at {ram:0}%. Free standby cache or inspect memory-heavy apps before launching another workload.";
+                DiagnosisSignal = "Triggered by RAM >= 85%";
+                DiagnosisActionText = "Open Boost";
+                DiagnosisRoute = "Boost";
+            }
+            else if (storage >= 88)
+            {
+                DiagnosisTitle = "Storage capacity is tight";
+                DiagnosisDetail = $"Disk usage is at {storage:0}%. Map large files first, then clean selected targets.";
+                DiagnosisSignal = "Triggered by storage >= 88%";
+                DiagnosisActionText = "Open Disk";
+                DiagnosisRoute = "Storage";
+            }
+            else if (processes >= 220)
+            {
+                DiagnosisTitle = "Background process load is high";
+                DiagnosisDetail = $"{processes:N0} processes are running. Review the list before ending anything.";
+                DiagnosisSignal = "Triggered by processes >= 220";
+                DiagnosisActionText = "Review Processes";
+                DiagnosisRoute = "Processes";
+            }
+            else if (cpu >= 80)
+            {
+                DiagnosisTitle = "CPU load spike";
+                DiagnosisDetail = $"CPU is at {cpu:0}%. Check active processes if this stays high.";
+                DiagnosisSignal = "Triggered by CPU >= 80%";
+                DiagnosisActionText = "Review Processes";
+                DiagnosisRoute = "Processes";
+            }
+            else
+            {
+                DiagnosisTitle = "No urgent bottleneck";
+                DiagnosisDetail = "Live metrics are inside normal thresholds. Use Boost Tuning only when memory, latency, or game focus needs attention.";
+                DiagnosisSignal = "All monitored thresholds are currently clear";
+                DiagnosisActionText = "Open Boost";
+                DiagnosisRoute = "Boost";
             }
         }
 

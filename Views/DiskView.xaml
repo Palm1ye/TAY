@@ -18,14 +18,14 @@
         </Grid.RowDefinitions>
         
         <!-- Page Header -->
-        <Grid Margin="4,0,4,16">
+        <Grid Margin="3,0,3,12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0">
                 <TextBlock Text="Analyze capacity and find heavy files" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
-                <TextBlock Text="Disk" FontFamily="Segoe UI" FontSize="28" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,2,0,0"/>
+                <TextBlock Text="Disk" FontFamily="Segoe UI" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,1,0,0"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                 <Button Content="Rescan Last" Style="{StaticResource OutlineButton}" Click="RescanLast_Click"/>
@@ -52,7 +52,7 @@
                 <GridView ItemsSource="{x:Bind ViewModel.Drives}" SelectionMode="None" Grid.Row="0">
                     <GridView.ItemTemplate>
                         <DataTemplate x:DataType="viewmodels:DriveItemVM">
-                            <Border Style="{StaticResource SweetCard}" Width="280" Height="170" Margin="0,0,12,12">
+                            <Border Style="{StaticResource SweetCard}" Width="260" Height="148" Margin="0,0,8,8">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
@@ -61,7 +61,7 @@
                                     </Grid.RowDefinitions>
                                     
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                        <FontIcon Glyph="&#xE7F6;" FontSize="18" Foreground="{StaticResource AccentMain}" Margin="0,0,12,0"/>
+                                        <FontIcon Glyph="&#xE7F6;" FontSize="17" Foreground="{StaticResource AccentMain}" Margin="0,0,10,0"/>
                                         <StackPanel VerticalAlignment="Center">
                                             <TextBlock Text="{x:Bind Label}" FontFamily="Segoe UI" FontSize="13" FontWeight="Bold" Foreground="White"/>
                                             <TextBlock Text="{x:Bind Letter}" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextDim}"/>
@@ -70,13 +70,13 @@
                                     
                                     <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="0,0,0,10">
                                         <!-- Minimalist Progress Line -->
-                                        <Border Background="#10FFFFFF" Height="4" CornerRadius="2" HorizontalAlignment="Left" Width="230">
+                                        <Border Background="#10FFFFFF" Height="4" CornerRadius="2" HorizontalAlignment="Left" Width="210">
                                             <Border Background="{StaticResource AccentMain}" Height="4" CornerRadius="2" HorizontalAlignment="Left" Width="{x:Bind UsedWidth}"/>
                                         </Border>
                                         <TextBlock Text="{x:Bind CapacityStr}" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextDim}" Margin="0,6,0,0"/>
                                     </StackPanel>
                                     
-                                    <Button Content="Analyze Storage" Command="{x:Bind AnalyzeCommand}" Style="{StaticResource SweetButton}" Grid.Row="2" HorizontalAlignment="Stretch" FontSize="11" Height="30" Padding="0,4"/>
+                                    <Button Content="Analyze Storage" Command="{x:Bind AnalyzeCommand}" Style="{StaticResource SweetButton}" Grid.Row="2" HorizontalAlignment="Stretch" FontSize="11" Height="28" Padding="0,4"/>
                                 </Grid>
                             </Border>
                         </DataTemplate>
@@ -102,7 +102,7 @@
                 <ListView ItemsSource="{x:Bind ViewModel.LargeFiles}" SelectionMode="None" Margin="0,0,0,8" Padding="0,0,0,12" Visibility="{x:Bind ViewModel.HasLargeFiles, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="viewmodels:LargeFileVM">
-                            <Border Background="#06FFFFFF" CornerRadius="8" Padding="12,8" Margin="4,0,4,4" BorderThickness="1" BorderBrush="{StaticResource CardBorder}">
+                            <Border Background="#06FFFFFF" CornerRadius="5" Padding="10,7" Margin="3,0,3,4" BorderThickness="1" BorderBrush="{StaticResource CardBorder}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
@@ -137,7 +137,7 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                        <Border Background="#1A7FE3A5" CornerRadius="8" Padding="8" Margin="0,0,12,0">
+                        <Border Background="#1A7FE3A5" CornerRadius="5" Padding="7" Margin="0,0,10,0">
                             <FontIcon Glyph="&#xE9F9;" FontSize="18" Foreground="{StaticResource AccentMain}"/>
                         </Border>
                         <TextBlock Text="Visual Storage Map" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextMain}" VerticalAlignment="Center"/>
@@ -148,7 +148,7 @@
                         <TextBlock Text="{x:Bind ViewModel.ScannedTotalSize, Mode=OneWay}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource AccentMain}"/>
                     </StackPanel>
 
-                    <!-- Bento Percentage Gauges Grid Structure -->
+                    <!-- Storage category gauges -->
                     <Grid Grid.Row="2" Margin="0,4,0,4">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -161,7 +161,7 @@
                         </Grid.RowDefinitions>
 
                         <!-- Segment 1: System Files (Uniform Card, Cyan Accent) -->
-                        <Border Grid.Row="0" Grid.Column="0" Background="#0C4AEADC" BorderBrush="#224AEADC" BorderThickness="1" CornerRadius="12" Margin="4" Padding="16">
+                        <Border Grid.Row="0" Grid.Column="0" Background="#0C4AEADC" BorderBrush="#224AEADC" BorderThickness="1" CornerRadius="6" Margin="4" Padding="16">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*"/>
@@ -182,7 +182,7 @@
                         </Border>
 
                         <!-- Segment 2: Applications & Games (Uniform Card, Sunset Gold) -->
-                        <Border Grid.Row="0" Grid.Column="1" Background="#0CFFD580" BorderBrush="#22FFD580" BorderThickness="1" CornerRadius="12" Margin="4" Padding="16">
+                        <Border Grid.Row="0" Grid.Column="1" Background="#0CFFD580" BorderBrush="#22FFD580" BorderThickness="1" CornerRadius="6" Margin="4" Padding="16">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*"/>
@@ -203,7 +203,7 @@
                         </Border>
 
                         <!-- Segment 3: User Media & Downloads (Uniform Card, Slate Blue) -->
-                        <Border Grid.Row="1" Grid.Column="0" Background="#0C89A5FF" BorderBrush="#2289A5FF" BorderThickness="1" CornerRadius="12" Margin="4" Padding="16">
+                        <Border Grid.Row="1" Grid.Column="0" Background="#0C89A5FF" BorderBrush="#2289A5FF" BorderThickness="1" CornerRadius="6" Margin="4" Padding="16">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*"/>
@@ -224,7 +224,7 @@
                         </Border>
 
                         <!-- Segment 4: Temp Cache Files (Uniform Card, Soft Coral Red) -->
-                        <Border Grid.Row="1" Grid.Column="1" Background="#0CFF8A8A" BorderBrush="#22FF8A8A" BorderThickness="1" CornerRadius="12" Margin="4" Padding="16">
+                        <Border Grid.Row="1" Grid.Column="1" Background="#0CFF8A8A" BorderBrush="#22FF8A8A" BorderThickness="1" CornerRadius="6" Margin="4" Padding="16">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*"/>
@@ -244,7 +244,7 @@
                             </Grid>
                         </Border>
 
-                        <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Background="#08FFFFFF" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="10" Margin="4" Padding="14,10">
+                        <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Background="#08FFFFFF" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="6" Margin="4" Padding="14,10">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>

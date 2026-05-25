@@ -23,7 +23,7 @@ namespace TAY.Views
 
         private void CopySpecs_Click(object sender, RoutedEventArgs e)
         {
-            var lines = new[]
+            var lines = new System.Collections.Generic.List<string>
             {
                 "TAY HARDWARE SPECS",
                 $"CPU: {ViewModel.CpuName}",
@@ -39,6 +39,16 @@ namespace TAY.Views
                 $"OS: {ViewModel.OsName}",
                 $"OS_BUILD: {ViewModel.OsBuildInfo}"
             };
+
+            foreach (var category in ViewModel.HardwareCategories)
+            {
+                lines.Add("");
+                lines.Add($"[{category.Title}]");
+                foreach (var row in category.Rows)
+                {
+                    lines.Add($"{row.Label}: {row.Value}");
+                }
+            }
 
             var data = new DataPackage();
             data.SetText(string.Join(Environment.NewLine, lines));

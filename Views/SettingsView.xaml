@@ -11,21 +11,21 @@
         </TransitionCollection>
     </Page.Transitions>
 
-    <Grid Margin="30,20,30,30">
+    <Grid Margin="24,16,24,24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- Page Header -->
-        <Grid Margin="4,0,4,16">
+        <Grid Margin="3,0,3,12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0">
                 <TextBlock Text="Updates, diagnostics, and safety controls" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
-                <TextBlock Text="Settings" FontFamily="Segoe UI" FontSize="28" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,2,0,0"/>
+                <TextBlock Text="Settings" FontFamily="Segoe UI" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,1,0,0"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                 <Button Content="Copy Info" Style="{StaticResource OutlineButton}" Click="CopyInfo_Click"/>
@@ -33,7 +33,7 @@
         </Grid>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="12" Padding="0,0,8,12">
+            <StackPanel Spacing="8" Padding="0,0,8,12">
                 <Grid ColumnSpacing="12">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -41,9 +41,9 @@
                     </Grid.ColumnDefinitions>
 
                     <Border Style="{StaticResource SweetCard}" Grid.Column="0">
-                        <StackPanel Spacing="14">
+                        <StackPanel Spacing="10">
                             <TextBlock Text="Application" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                            <TextBlock Text="{x:Bind ViewModel.AppName}" FontFamily="Segoe UI" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextMain}"/>
+                            <TextBlock Text="{x:Bind ViewModel.AppName}" FontFamily="Segoe UI" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextMain}"/>
                             <TextBlock Text="Native Windows optimizer with real-time telemetry, cleanup tools, startup control, and reversible system tuning." FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}" TextWrapping="Wrap"/>
                             <Grid Margin="0,8,0,0">
                                 <Grid.ColumnDefinitions>
@@ -73,9 +73,9 @@
                     </Border>
 
                     <Border Style="{StaticResource SweetCard}" Grid.Column="1">
-                        <StackPanel Spacing="14">
+                        <StackPanel Spacing="10">
                             <TextBlock Text="System Snapshot" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                            <TextBlock Text="{x:Bind ViewModel.WindowsInfo, Mode=OneWay}" FontFamily="Segoe UI" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" TextWrapping="Wrap"/>
+                            <TextBlock Text="{x:Bind ViewModel.WindowsInfo, Mode=OneWay}" FontFamily="Segoe UI" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" TextWrapping="Wrap"/>
                             <TextBlock Text="{x:Bind ViewModel.HardwareSummary, Mode=OneWay}" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}" TextWrapping="Wrap"/>
                             <TextBlock Text="{x:Bind ViewModel.ArchitectureInfo}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap"/>
                             <StackPanel Orientation="Horizontal" Spacing="8">
@@ -87,7 +87,7 @@
                 </Grid>
 
                 <Border Style="{StaticResource SweetCard}">
-                    <StackPanel Spacing="16">
+                    <StackPanel Spacing="12">
                         <TextBlock Text="Update Control" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
                         <Grid ColumnSpacing="16">
                             <Grid.ColumnDefinitions>
@@ -124,9 +124,9 @@
                     </Grid.ColumnDefinitions>
 
                     <Border Style="{StaticResource SweetCard}" Grid.Column="0">
-                        <StackPanel Spacing="14">
+                        <StackPanel Spacing="10">
                             <TextBlock Text="Local Maintenance" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                            <TextBlock Text="{x:Bind ViewModel.BackupStatus, Mode=OneWay}" FontFamily="Segoe UI" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" TextWrapping="Wrap"/>
+                            <TextBlock Text="{x:Bind ViewModel.BackupStatus, Mode=OneWay}" FontFamily="Segoe UI" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" TextWrapping="Wrap"/>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="120"/>
@@ -152,7 +152,7 @@
                     </Border>
 
                     <Border Style="{StaticResource SweetCard}" Grid.Column="1">
-                        <StackPanel Spacing="14">
+                        <StackPanel Spacing="10">
                             <TextBlock Text="Safety Model" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
                             <TextBlock Text="High-impact operations now surface confirmations, reversible backup state, and clearer status messages." FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}" TextWrapping="Wrap"/>
                             <Grid>

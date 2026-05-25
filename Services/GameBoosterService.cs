@@ -15,10 +15,10 @@ namespace TAY.Services
         private static readonly string BackupPath = Path.Combine(BackupDir, "gamebooster_backup.json");
 
         private static readonly string[] OptimizeServices = { "wuauserv", "SysMain", "WerSvc" };
-        private static readonly string[] MonitorGames = {
+        public static readonly string[] MonitorGames = {
             "cs2", "dota2", "RocketLeague", "GTA5", "Cyberpunk2077", 
             "VALORANT-Win64-Shipping", "FortniteClient-Win64-Shipping", 
-            "League of Legends", "Overwatch", "notepad", "calc"
+            "League of Legends", "Overwatch"
         };
 
         private static List<string> _pausedServices = new();

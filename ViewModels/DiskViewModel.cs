@@ -114,12 +114,13 @@ namespace TAY.ViewModels
                 stack.Push(($"{driveLetter}:\\", 0));
 
                 int processedDirectories = 0;
-                int maxFilesLimit = 100000; 
+                int maxFilesLimit = 120000;
+                int maxDepth = 8;
 
                 while (stack.Count > 0 && filesList.Count < maxFilesLimit)
                 {
                     var (currentPath, depth) = stack.Pop();
-                    if (depth > 6) continue; // limit depth to stay fast and avoid deep system appdata folders
+                    if (depth > maxDepth) continue;
 
                     try
                     {
@@ -127,9 +128,8 @@ namespace TAY.ViewModels
                         if ((dir.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint)
                             continue; // Skip junction points/symbolic links to prevent circular loops
 
-                        string dirName = dir.Name.ToLower();
-                        // Bypassing directories that the user cannot/should not clean to dramatically speed up scan
-                        if (dirName == "system volume information" || dirName == "$recycle.bin" || dirName == "windows" || dirName == "$winreagent" || dirName == "microsoft" || dirName == "assembly")
+                        string dirName = dir.Name.ToLowerInvariant();
+                        if (dirName == "system volume information" || dirName == "$winreagent")
                             continue;
 
                         // Enumerate files
@@ -160,12 +160,12 @@ namespace TAY.ViewModels
                             catch { }
                         }
 
-                        // Enumerate subdirectories
                         foreach (var d in dir.EnumerateDirectories())
                         {
                             try
                             {
-                                if ((d.Attributes & FileAttributes.ReparsePoint) != FileAttributes.ReparsePoint)
+                                if ((d.Attributes & FileAttributes.ReparsePoint) != FileAttributes.ReparsePoint &&
+                                    ShouldEnterDirectory(d.FullName, depth + 1, maxDepth))
                                 {
                                     stack.Push((d.FullName, depth + 1));
                                 }
@@ -206,7 +206,9 @@ namespace TAY.ViewModels
                     foreach (var f in topFiles)
                         LargeFiles.Add(new LargeFileVM(f));
                     HasLargeFiles = LargeFiles.Count > 0;
-                    ScanStatus = $"Scan complete. Processed {processedDirectories} folders. Showing top 50 largest files.";
+                    ScanStatus = filesList.Count >= maxFilesLimit
+                        ? $"Scan capped at {maxFilesLimit:N0} files after {processedDirectories:N0} folders. Showing top 50 largest files."
+                        : $"Scan complete. Processed {processedDirectories:N0} folders. Showing top 50 largest files.";
                     SystemFilesSize = SystemService.FormatBytes(systemFiles);
                     ApplicationsSize = SystemService.FormatBytes(applications);
                     UserMediaSize = SystemService.FormatBytes(userMedia);
@@ -227,6 +229,24 @@ namespace TAY.ViewModels
             UserMedia,
             CacheTemp,
             Other
+        }
+
+        private static bool ShouldEnterDirectory(string path, int depth, int maxDepth)
+        {
+            var lower = path.ToLowerInvariant();
+            if (depth > maxDepth) return false;
+
+            if (lower.Contains("\\windows\\winsxs\\") ||
+                lower.Contains("\\windows\\servicing\\") ||
+                lower.Contains("\\windows\\system32\\driverstore\\filerepository\\") ||
+                lower.Contains("\\appdata\\local\\packages\\") ||
+                lower.Contains("\\node_modules\\") ||
+                lower.Contains("\\.git\\"))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private static StorageCategory ClassifyStorageFile(FileInfo file)
@@ -330,7 +350,7 @@ namespace TAY.ViewModels
             Label = d.Label;
             CapacityStr = $"{SystemService.FormatBytes(d.Free)} free of {SystemService.FormatBytes(d.Total)}";
             UsedPercent = (double)d.Used / d.Total * 100;
-            UsedWidth = (UsedPercent / 100.0) * 300;
+            UsedWidth = (UsedPercent / 100.0) * 210;
         }
 
         [RelayCommand]

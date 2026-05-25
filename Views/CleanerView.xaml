@@ -14,16 +14,16 @@
         </TransitionCollection>
     </Page.Transitions>
 
-    <Grid Margin="30,20,30,30">
+    <Grid Margin="24,16,24,24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
         <!-- Page Header -->
-        <StackPanel Margin="4,0,4,16">
+        <StackPanel Margin="3,0,3,12">
             <TextBlock Text="Temporary files and cache" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
-            <TextBlock Text="Cleaner" FontFamily="Segoe UI" FontSize="28" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,2,0,0"/>
+            <TextBlock Text="Cleaner" FontFamily="Segoe UI" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,1,0,0"/>
         </StackPanel>
         
         <Grid Grid.Row="1">
@@ -33,7 +33,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Directories ListView (Sleek terminal rows) -->
-            <ListView ItemsSource="{x:Bind ViewModel.Folders}" SelectionMode="None" Margin="0,0,16,0">
+            <ListView ItemsSource="{x:Bind ViewModel.Folders}" SelectionMode="None" Margin="0,0,10,0">
                 <ListView.Header>
                     <Grid Margin="16,0,16,10">
                         <Grid.ColumnDefinitions>
@@ -47,7 +47,7 @@
                 </ListView.Header>
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="viewmodels:FolderItemVM">
-                        <Border Background="{StaticResource RowBg}" CornerRadius="4" Padding="14,8" Margin="4,0,4,6" BorderThickness="1" BorderBrush="{StaticResource RowBorder}">
+                        <Border Background="{StaticResource RowBg}" CornerRadius="4" Padding="12,7" Margin="3,0,3,4" BorderThickness="1" BorderBrush="{StaticResource RowBorder}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
@@ -69,8 +69,8 @@
                 </ListView.ItemTemplate>
             </ListView>
 
-            <!-- Summary Bento Card -->
-            <Border Style="{StaticResource SweetCard}" Grid.Column="1" VerticalAlignment="Top" Padding="20">
+            <!-- Summary panel -->
+            <Border Style="{StaticResource SweetCard}" Grid.Column="1" VerticalAlignment="Top">
                 <StackPanel>
                     <TextBlock Text="Cleanup Summary" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
                     

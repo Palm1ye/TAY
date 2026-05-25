@@ -14,6 +14,8 @@ namespace TAY.Services
         public string Provider { get; set; } = "";
         public bool IsOutdated { get; set; } = false;
         public string Suggestion { get; set; } = "";
+        public string StatusLabel => IsOutdated ? "Needs review" : "Current";
+        public string DateLabel => DriverDate.HasValue ? DriverDate.Value.ToString("yyyy-MM-dd") : "Unknown date";
     }
 
     public class DriverService

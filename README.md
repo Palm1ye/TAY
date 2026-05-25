@@ -1,11 +1,11 @@
-<p align="center">
+﻿<p align="center">
   <img src="Assets/tay.png" alt="TAY Logo" width="180"/>
 </p>
 
 <h1 align="center">TAY - System Optimizer</h1>
 
 <p align="center">
-  <strong>Version:</strong> v0.2.0
+  <strong>Version:</strong> v0.3.0
 </p>
 
 <p align="center">

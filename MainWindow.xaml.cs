@@ -34,6 +34,7 @@ namespace TAY
             this.SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop();
 
             ConfigureWindow();
+            RootFrame.Navigated += (_, _) => SyncSelectedTabWithCurrentPage();
             UpdateTabVisuals(TabOptimize);
             Navigate("Optimize");
 
@@ -50,7 +51,7 @@ namespace TAY
                 var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
                 var appWindow = AppWindow.GetFromWindowId(windowId);
 
-                appWindow.Resize(new SizeInt32(1180, 760));
+                appWindow.Resize(new SizeInt32(1220, 760));
                 appWindow.SetIcon("Assets\\tay.ico");
 
                 this.ExtendsContentIntoTitleBar = true;
@@ -151,7 +152,7 @@ namespace TAY
         private void ToggleSidebarButton_Click(object sender, RoutedEventArgs e)
         {
             _isSidebarCompact = !_isSidebarCompact;
-            SidebarColumn.Width = new GridLength(_isSidebarCompact ? 56 : 250);
+            SidebarColumn.Width = new GridLength(_isSidebarCompact ? 56 : 224);
             SidebarButtonsPanel.Orientation = _isSidebarCompact ? Orientation.Vertical : Orientation.Horizontal;
 
             var labelVisibility = _isSidebarCompact ? Visibility.Collapsed : Visibility.Visible;
@@ -166,9 +167,9 @@ namespace TAY
             SettingsLabel.Visibility = labelVisibility;
 
             // Adjust button padding and centering when compact to prevent clipping
-            var buttonPadding = _isSidebarCompact ? new Thickness(0) : new Thickness(14, 0, 14, 0);
+            var buttonPadding = _isSidebarCompact ? new Thickness(0) : new Thickness(12, 0, 12, 0);
             var contentAlignment = _isSidebarCompact ? HorizontalAlignment.Center : HorizontalAlignment.Left;
-            double iconSpacing = _isSidebarCompact ? 0 : 14;
+            double iconSpacing = _isSidebarCompact ? 0 : 12;
 
             var buttons = new List<Button> { TabOptimize, TabBoost, TabHardware, TabStartup, TabClean, TabStorage, TabProcesses, TabSettings };
             foreach (var btn in buttons)
