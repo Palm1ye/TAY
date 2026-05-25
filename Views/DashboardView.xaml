@@ -30,13 +30,13 @@
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="SYSTEM // MONITOR" FontFamily="Consolas" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMuted}" CharacterSpacing="140"/>
-                    <TextBlock Text="sys_overview.sh" FontFamily="Consolas" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextMain}" Margin="0,4,0,0"/>
+                    <TextBlock Text="System control center" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
+                    <TextBlock Text="Dashboard" FontFamily="Segoe UI" FontSize="28" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,2,0,0"/>
                 </StackPanel>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                <Button x:Name="QuickBoostBtn" Content="[ quick_boost ]" Style="{StaticResource OutlineButton}" Foreground="{StaticResource AccentMain}" Click="QuickBoost_Click"/>
-                <Button Content="[ copy_snapshot ]" Style="{StaticResource OutlineButton}" Click="CopySnapshot_Click"/>
+                <Button x:Name="QuickBoostBtn" Content="Quick Boost" Style="{StaticResource SweetButton}" Click="QuickBoost_Click"/>
+                <Button Content="Copy Snapshot" Style="{StaticResource OutlineButton}" Click="CopySnapshot_Click"/>
             </StackPanel>
         </Grid>
         
@@ -63,13 +63,13 @@
                     </Grid.RowDefinitions>
                     
                     <StackPanel Orientation="Horizontal" Grid.Row="0">
-                        <TextBlock Text="CPU // LOAD" FontFamily="Consolas" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextDim}" CharacterSpacing="80"/>
+                        <TextBlock Text="CPU Load" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextDim}"/>
                     </StackPanel>
                     
                     <!-- Huge prominent monospace stats value -->
                     <StackPanel Grid.Row="1" Margin="0,16,0,16" VerticalAlignment="Center">
                         <TextBlock Text="{x:Bind ViewModel.CpuUsage, Mode=OneWay}" FontFamily="Consolas" FontSize="38" FontWeight="Bold" Foreground="{StaticResource AccentMain}"/>
-                        <TextBlock Text="telemetry_active" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource TextMuted}"/>
+                        <TextBlock Text="Live telemetry" FontFamily="Segoe UI" FontSize="11" Foreground="{StaticResource TextMuted}"/>
                     </StackPanel>
                     
                     <!-- Thin minimalist progress line -->
@@ -87,13 +87,13 @@
                     </Grid.RowDefinitions>
                     
                     <StackPanel Orientation="Horizontal" Grid.Row="0">
-                        <TextBlock Text="RAM // USAGE" FontFamily="Consolas" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextDim}" CharacterSpacing="80"/>
+                        <TextBlock Text="Memory" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextDim}"/>
                     </StackPanel>
                     
                     <!-- Huge prominent monospace stats value -->
                     <StackPanel Grid.Row="1" Margin="0,16,0,16" VerticalAlignment="Center">
                         <TextBlock Text="{x:Bind ViewModel.RamUsage, Mode=OneWay}" FontFamily="Consolas" FontSize="38" FontWeight="Bold" Foreground="{StaticResource AccentWarning}"/>
-                        <TextBlock Text="heap_allocated" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource TextMuted}"/>
+                        <TextBlock Text="Physical RAM in use" FontFamily="Segoe UI" FontSize="11" Foreground="{StaticResource TextMuted}"/>
                     </StackPanel>
                     
                     <!-- Thin minimalist progress line -->
@@ -111,12 +111,12 @@
                     </Grid.RowDefinitions>
                     
                     <StackPanel Orientation="Horizontal" Grid.Row="0">
-                        <TextBlock Text="GPU // LOAD" FontFamily="Consolas" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextDim}" CharacterSpacing="80"/>
+                        <TextBlock Text="GPU Load" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextDim}"/>
                     </StackPanel>
                     
                     <StackPanel Grid.Row="1" Margin="0,16,0,16" VerticalAlignment="Center">
                         <TextBlock Text="{x:Bind ViewModel.GpuUsage, Mode=OneWay}" FontFamily="Consolas" FontSize="38" FontWeight="Bold" Foreground="{StaticResource AccentInfo}"/>
-                        <TextBlock Text="render_engine_active" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource TextMuted}"/>
+                        <TextBlock Text="Render engine activity" FontFamily="Segoe UI" FontSize="11" Foreground="{StaticResource TextMuted}"/>
                     </StackPanel>
                     
                     <ProgressBar Grid.Row="2" Value="{x:Bind ViewModel.GpuValue, Mode=OneWay}" Minimum="0" Maximum="100" Height="2" Foreground="{StaticResource AccentInfo}" Background="#103B9FFF"/>
@@ -131,7 +131,7 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Text="DISK // USAGE" FontFamily="Consolas" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextDim}" CharacterSpacing="80"/>
+                    <TextBlock Text="Storage" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextDim}"/>
                     <StackPanel Grid.Row="1" Margin="0,14,0,14" VerticalAlignment="Center">
                         <TextBlock Text="{x:Bind ViewModel.DiskUsage, Mode=OneWay}" FontFamily="Consolas" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextMain}"/>
                         <TextBlock Text="{x:Bind ViewModel.DiskFree, Mode=OneWay}" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource TextMuted}"/>
@@ -148,10 +148,10 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Text="SYS // UPTIME" FontFamily="Consolas" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextDim}" CharacterSpacing="80"/>
+                    <TextBlock Text="Uptime &amp; Power" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextDim}"/>
                     <StackPanel Grid.Row="1" Margin="0,14,0,10" VerticalAlignment="Center">
                         <TextBlock Text="{x:Bind ViewModel.Uptime, Mode=OneWay}" FontFamily="Consolas" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextMain}"/>
-                        <TextBlock Text="kernel_up_status" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource TextMuted}"/>
+                        <TextBlock Text="Current system session" FontFamily="Segoe UI" FontSize="11" Foreground="{StaticResource TextMuted}"/>
                     </StackPanel>
                     <ComboBox Grid.Row="2" ItemsSource="{x:Bind ViewModel.PowerPlans, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedPlan, Mode=TwoWay}" DisplayMemberPath="Name" HorizontalAlignment="Stretch" CornerRadius="4" Background="{StaticResource RowBg}" Foreground="{StaticResource TextMain}" BorderBrush="{StaticResource RowBorder}" FontFamily="Consolas" FontSize="11" Height="28"/>
                 </Grid>
@@ -160,9 +160,9 @@
             <!-- Bento Card 6: Process Count -->
             <Border Style="{StaticResource SweetCard}" Grid.Column="2" Grid.Row="1">
                 <StackPanel>
-                    <TextBlock Text="PROC // ACTIVE" FontFamily="Consolas" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextDim}" CharacterSpacing="80"/>
+                    <TextBlock Text="Processes" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextDim}"/>
                     <TextBlock Text="{x:Bind ViewModel.ProcessCount, Mode=OneWay}" FontFamily="Consolas" FontSize="28" FontWeight="Bold" Foreground="{StaticResource AccentWarning}" Margin="0,14,0,2"/>
-                    <TextBlock Text="running_processes" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock Text="Running right now" FontFamily="Segoe UI" FontSize="11" Foreground="{StaticResource TextMuted}"/>
                 </StackPanel>
             </Border>
 
@@ -174,7 +174,7 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     
-                    <TextBlock Text="TELEMETRY // CPU_RAM_GPU" FontFamily="Consolas" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextDim}" CharacterSpacing="80" Margin="0,0,0,12" Grid.Row="0"/>
+                    <TextBlock Text="Telemetry History" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,0,0,12" Grid.Row="0"/>
                     
                     <!-- LiveCharts2 Real Cartesian Chart Integration -->
                     <Grid Grid.Row="1">
@@ -198,7 +198,7 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     
-                    <TextBlock Text="SYS // DENSE_SPECIFICATIONS_DUMP" FontFamily="Consolas" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextDim}" CharacterSpacing="80" Margin="0,0,0,16" Grid.Row="0"/>
+                    <TextBlock Text="Hardware Summary" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,0,0,16" Grid.Row="0"/>
                     
                     <Grid Grid.Row="1" VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
@@ -213,19 +213,19 @@
                         </Grid.RowDefinitions>
                         
                         <!-- Processor -->
-                        <TextBlock Text="SYS // PROCESSOR     :" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMuted}" Grid.Row="0" Grid.Column="0" Margin="0,0,0,10"/>
+                        <TextBlock Text="Processor" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextMuted}" Grid.Row="0" Grid.Column="0" Margin="0,0,0,10"/>
                         <TextBlock Text="{x:Bind ViewModel.CpuModel, Mode=OneWay}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMain}" Grid.Row="0" Grid.Column="1" TextTrimming="CharacterEllipsis" Margin="0,0,0,10"/>
                         
                         <!-- Graphics Card -->
-                        <TextBlock Text="SYS // GRAPHICS CARD :" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMuted}" Grid.Row="1" Grid.Column="0" Margin="0,0,0,10"/>
+                        <TextBlock Text="Graphics" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextMuted}" Grid.Row="1" Grid.Column="0" Margin="0,0,0,10"/>
                         <TextBlock Text="{x:Bind ViewModel.GpuModel, Mode=OneWay}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMain}" Grid.Row="1" Grid.Column="1" TextTrimming="CharacterEllipsis" Margin="0,0,0,10"/>
                         
                         <!-- System Memory -->
-                        <TextBlock Text="SYS // MEMORY        :" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMuted}" Grid.Row="2" Grid.Column="0" Margin="0,0,0,10"/>
+                        <TextBlock Text="Memory" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextMuted}" Grid.Row="2" Grid.Column="0" Margin="0,0,0,10"/>
                         <TextBlock Text="{x:Bind ViewModel.RamAmount, Mode=OneWay}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMain}" Grid.Row="2" Grid.Column="1" Margin="0,0,0,10"/>
                         
                         <!-- Baseboard -->
-                        <TextBlock Text="SYS // BASEBOARD     :" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMuted}" Grid.Row="3" Grid.Column="0"/>
+                        <TextBlock Text="Baseboard" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextMuted}" Grid.Row="3" Grid.Column="0"/>
                         <TextBlock Text="{x:Bind ViewModel.MotherboardModel, Mode=OneWay}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMain}" Grid.Row="3" Grid.Column="1" TextTrimming="CharacterEllipsis"/>
                     </Grid>
                 </Grid>
@@ -244,9 +244,9 @@
                     <TextBlock x:Name="QuickBoostStatusText" Text="Initializing..." FontFamily="Consolas" FontSize="12" Foreground="{StaticResource TextMain}" VerticalAlignment="Center"/>
                 </StackPanel>
                 <StackPanel Spacing="6">
-                    <TextBlock x:Name="QuickBoostStep1" Text="[ ... ] Sweeping managed heap" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextMuted}"/>
-                    <TextBlock x:Name="QuickBoostStep2" Text="[ ... ] Trimming working sets" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextMuted}"/>
-                    <TextBlock x:Name="QuickBoostStep3" Text="[ ... ] Finalizing report" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock x:Name="QuickBoostStep1" Text="Preparing managed memory sweep" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock x:Name="QuickBoostStep2" Text="Waiting to trim working sets" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock x:Name="QuickBoostStep3" Text="Waiting to finalize report" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextMuted}"/>
                 </StackPanel>
                 <TextBlock x:Name="QuickBoostSummaryText" Text="" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextDim}"/>
             </StackPanel>

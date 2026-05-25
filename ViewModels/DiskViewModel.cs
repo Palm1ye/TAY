@@ -26,6 +26,9 @@ namespace TAY.ViewModels
         private string mapStatus = "Select a drive to map storage.";
 
         [ObservableProperty]
+        private bool hasLargeFiles = false;
+
+        [ObservableProperty]
         private string systemFilesSize = "0 MB";
 
         [ObservableProperty]
@@ -36,6 +39,12 @@ namespace TAY.ViewModels
 
         [ObservableProperty]
         private string cacheTempSize = "0 MB";
+
+        [ObservableProperty]
+        private string otherFilesSize = "0 MB";
+
+        [ObservableProperty]
+        private string scannedTotalSize = "0 MB scanned";
 
         [ObservableProperty]
         private double systemPercent = 0;
@@ -50,6 +59,9 @@ namespace TAY.ViewModels
         private double cachePercent = 0;
 
         [ObservableProperty]
+        private double otherPercent = 0;
+
+        [ObservableProperty]
         private string systemPercentStr = "0.0%";
 
         [ObservableProperty]
@@ -60,6 +72,9 @@ namespace TAY.ViewModels
 
         [ObservableProperty]
         private string cachePercentStr = "0.0%";
+
+        [ObservableProperty]
+        private string otherPercentStr = "0.0%";
 
         private readonly Microsoft.UI.Dispatching.DispatcherQueue _dispatcher;
 
@@ -84,6 +99,7 @@ namespace TAY.ViewModels
             IsScanning = true;
             LastDrive = driveLetter;
             LargeFiles.Clear();
+            HasLargeFiles = false;
             ScanStatus = $"Scanning drive {driveLetter}:\\ ...";
 
             Task.Run(() =>
@@ -93,6 +109,7 @@ namespace TAY.ViewModels
                 long applications = 0;
                 long userMedia = 0;
                 long cacheTemp = 0;
+                long otherFiles = 0;
                 var stack = new System.Collections.Generic.Stack<(string path, int depth)>();
                 stack.Push(($"{driveLetter}:\\", 0));
 
@@ -135,6 +152,9 @@ namespace TAY.ViewModels
                                     case StorageCategory.CacheTemp:
                                         cacheTemp += f.Length;
                                         break;
+                                    case StorageCategory.Other:
+                                        otherFiles += f.Length;
+                                        break;
                                 }
                             }
                             catch { }
@@ -163,6 +183,7 @@ namespace TAY.ViewModels
                         long currentApplications = applications;
                         long currentUserMedia = userMedia;
                         long currentCacheTemp = cacheTemp;
+                        long currentOther = otherFiles;
                         _dispatcher?.TryEnqueue(() => ScanStatus = status);
                         _dispatcher?.TryEnqueue(() =>
                         {
@@ -170,9 +191,11 @@ namespace TAY.ViewModels
                             ApplicationsSize = SystemService.FormatBytes(currentApplications);
                             UserMediaSize = SystemService.FormatBytes(currentUserMedia);
                             CacheTempSize = SystemService.FormatBytes(currentCacheTemp);
+                            OtherFilesSize = SystemService.FormatBytes(currentOther);
+                            ScannedTotalSize = $"{SystemService.FormatBytes(currentSystem + currentApplications + currentUserMedia + currentCacheTemp + currentOther)} scanned";
                             MapStatus = $"Live map for {driveLetter}:\\";
                         });
-                        UpdateWeights(currentSystem, currentApplications, currentUserMedia, currentCacheTemp);
+                        UpdateWeights(currentSystem, currentApplications, currentUserMedia, currentCacheTemp, currentOther);
                     }
                 }
 
@@ -182,15 +205,18 @@ namespace TAY.ViewModels
                 {
                     foreach (var f in topFiles)
                         LargeFiles.Add(new LargeFileVM(f));
+                    HasLargeFiles = LargeFiles.Count > 0;
                     ScanStatus = $"Scan complete. Processed {processedDirectories} folders. Showing top 50 largest files.";
                     SystemFilesSize = SystemService.FormatBytes(systemFiles);
                     ApplicationsSize = SystemService.FormatBytes(applications);
                     UserMediaSize = SystemService.FormatBytes(userMedia);
                     CacheTempSize = SystemService.FormatBytes(cacheTemp);
+                    OtherFilesSize = SystemService.FormatBytes(otherFiles);
+                    ScannedTotalSize = $"{SystemService.FormatBytes(systemFiles + applications + userMedia + cacheTemp + otherFiles)} scanned";
                     MapStatus = $"Storage map for {driveLetter}:\\ based on scanned files.";
                     IsScanning = false;
                 });
-                UpdateWeights(systemFiles, applications, userMedia, cacheTemp);
+                UpdateWeights(systemFiles, applications, userMedia, cacheTemp, otherFiles);
             });
         }
 
@@ -199,7 +225,8 @@ namespace TAY.ViewModels
             System,
             Applications,
             UserMedia,
-            CacheTemp
+            CacheTemp,
+            Other
         }
 
         private static StorageCategory ClassifyStorageFile(FileInfo file)
@@ -231,7 +258,14 @@ namespace TAY.ViewModels
                 return StorageCategory.UserMedia;
             }
 
-            return StorageCategory.System;
+            if (path.Contains("\\windows\\") ||
+                path.Contains("\\drivers\\") ||
+                extension is ".sys" or ".dll" or ".drv")
+            {
+                return StorageCategory.System;
+            }
+
+            return StorageCategory.Other;
         }
 
         public void RescanLast()
@@ -242,9 +276,9 @@ namespace TAY.ViewModels
             }
         }
 
-        private void UpdateWeights(long system, long apps, long media, long cache)
+        private void UpdateWeights(long system, long apps, long media, long cache, long other)
         {
-            double total = system + apps + media + cache;
+            double total = system + apps + media + cache + other;
             if (total == 0)
             {
                 _dispatcher?.TryEnqueue(() =>
@@ -253,10 +287,12 @@ namespace TAY.ViewModels
                     AppsPercent = 0;
                     MediaPercent = 0;
                     CachePercent = 0;
+                    OtherPercent = 0;
                     SystemPercentStr = "0.0%";
                     AppsPercentStr = "0.0%";
                     MediaPercentStr = "0.0%";
                     CachePercentStr = "0.0%";
+                    OtherPercentStr = "0.0%";
                 });
                 return;
             }
@@ -267,11 +303,13 @@ namespace TAY.ViewModels
                 AppsPercent = (double)apps / total * 100;
                 MediaPercent = (double)media / total * 100;
                 CachePercent = (double)cache / total * 100;
+                OtherPercent = (double)other / total * 100;
 
                 SystemPercentStr = $"{SystemPercent:F1}%";
                 AppsPercentStr = $"{AppsPercent:F1}%";
                 MediaPercentStr = $"{MediaPercent:F1}%";
                 CachePercentStr = $"{CachePercent:F1}%";
+                OtherPercentStr = $"{OtherPercent:F1}%";
             });
         }
     }
@@ -307,12 +345,14 @@ namespace TAY.ViewModels
         public string Name { get; }
         public string Path { get; }
         public string SizeStr { get; }
+        public string FolderPath { get; }
 
         public LargeFileVM(FileInfo f)
         {
             Name = f.Name;
             Path = f.FullName;
             SizeStr = SystemService.FormatBytes(f.Length);
+            FolderPath = f.DirectoryName ?? "";
         }
     }
 }

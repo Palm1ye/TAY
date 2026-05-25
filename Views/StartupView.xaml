@@ -17,7 +17,8 @@
     <Grid Margin="30,20,30,30">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/> <!-- Table Header -->
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -28,29 +29,46 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0">
-                <TextBlock Text="STARTUP // BOOT_CONFIG" FontFamily="Consolas" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMuted}" CharacterSpacing="140"/>
-                <TextBlock Text="init_d.conf" FontFamily="Consolas" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextMain}" Margin="0,4,0,0"/>
+                <TextBlock Text="Boot behavior and launch impact" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
+                <TextBlock Text="Startup" FontFamily="Segoe UI" FontSize="28" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,2,0,0"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                <Button Content="[ enable_all ]" Style="{StaticResource OutlineButton}" Click="EnableAll_Click"/>
-                <Button Content="[ disable_all ]" Style="{StaticResource OutlineButton}" Click="DisableAll_Click"/>
+                <Button Content="Enable All" Style="{StaticResource OutlineButton}" Click="EnableAll_Click"/>
+                <Button Content="Disable All" Style="{StaticResource OutlineButton}" Click="DisableAll_Click"/>
             </StackPanel>
         </Grid>
 
+        <Border Grid.Row="1" Style="{StaticResource SweetCard}" Padding="16,12" Margin="4,0,4,14">
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{x:Bind ViewModel.Guidance, Mode=OneWay}" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                <ComboBox Grid.Column="1" ItemsSource="{x:Bind ViewModel.SortOptions}" SelectedItem="{x:Bind ViewModel.SelectedSort, Mode=TwoWay}" HorizontalAlignment="Stretch" Height="32" Background="{StaticResource RowBg}" BorderBrush="{StaticResource RowBorder}" Foreground="{StaticResource TextMain}"/>
+                <Button Grid.Column="2" Content="Name" Command="{x:Bind ViewModel.SortByNameCommand}" Style="{StaticResource OutlineButton}"/>
+                <Button Grid.Column="3" Content="Impact" Command="{x:Bind ViewModel.SortByImpactCommand}" Style="{StaticResource OutlineButton}"/>
+                <Button Grid.Column="4" Content="Status" Command="{x:Bind ViewModel.SortByEnabledCommand}" Style="{StaticResource OutlineButton}"/>
+            </Grid>
+        </Border>
+
         <!-- Table Header Row -->
-        <Grid Grid.Row="1" Margin="16,0,16,8">
+        <Grid Grid.Row="2" Margin="16,0,16,8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="150"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="// APP NAME / COMMAND" FontFamily="Consolas" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextMuted}" CharacterSpacing="80" Grid.Column="0"/>
-            <TextBlock Text="// BOOT IMPACT" FontFamily="Consolas" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextMuted}" CharacterSpacing="80" Grid.Column="1"/>
-            <TextBlock Text="// STARTUP STATUS" FontFamily="Consolas" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextMuted}" CharacterSpacing="80" Grid.Column="2" HorizontalAlignment="Right"/>
+            <TextBlock Text="Application" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}" Grid.Column="0"/>
+            <TextBlock Text="Impact" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}" Grid.Column="1"/>
+            <TextBlock Text="Status" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}" Grid.Column="2" HorizontalAlignment="Right"/>
         </Grid>
 
         <!-- Startup ListView (Sleek terminal rows) -->
-        <ListView ItemsSource="{x:Bind ViewModel.Apps}" SelectionMode="None" Grid.Row="2" Padding="0,0,0,16">
+        <ListView ItemsSource="{x:Bind ViewModel.Apps}" SelectionMode="None" Grid.Row="3" Padding="0,0,0,16">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="viewmodels:StartupAppVM">
                     <!-- Dense Console output row -->
@@ -74,7 +92,9 @@
                             </StackPanel>
                             
                             <!-- Column 1: Impact level -->
-                            <TextBlock Text="{x:Bind Impact}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource AccentWarning}" VerticalAlignment="Center" Grid.Column="1"/>
+                            <Border Grid.Column="1" Background="#14FFFFFF" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="10" Padding="10,3" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                <TextBlock Text="{x:Bind Impact}" FontFamily="Segoe UI" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentWarning}"/>
+                            </Border>
                             
                             <!-- Column 2: Status Toggle Switch -->
                             <ToggleSwitch IsOn="{x:Bind IsEnabled, Mode=TwoWay}" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" OnContent="" OffContent="" MinWidth="0" Margin="0,0,-4,0"/>

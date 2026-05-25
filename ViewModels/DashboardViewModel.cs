@@ -91,12 +91,16 @@ namespace TAY.ViewModels
 
         public ObservableCollection<PowerPlan> PowerPlans { get; } = new();
 
+        public ObservableCollection<string> LogLines => RealTimeLogService.Instance.LogLines;
+
         [ObservableProperty]
         private PowerPlan? selectedPlan;
 
         public DashboardViewModel()
         {
             _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+            RealTimeLogService.Instance.Initialize(_dispatcherQueue);
+            RealTimeLogService.Instance.Log("Tay System Optimizer Dashboard initialized.");
             
             for (int i = 0; i < 20; i++)
             {

@@ -2,6 +2,8 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using Windows.ApplicationModel.DataTransfer;
 using TAY.ViewModels;
 
@@ -46,6 +48,52 @@ namespace TAY.Views
 
             var data = new DataPackage();
             data.SetText(string.Join(Environment.NewLine, lines));
+            Clipboard.SetContent(data);
+        }
+
+        private void OpenFileLocation_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button button || button.DataContext is not LargeFileVM file)
+            {
+                return;
+            }
+
+            try
+            {
+                if (File.Exists(file.Path))
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = "explorer.exe",
+                        ArgumentList = { "/select,", file.Path },
+                        UseShellExecute = true
+                    });
+                    return;
+                }
+
+                if (Directory.Exists(file.FolderPath))
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = file.FolderPath,
+                        UseShellExecute = true
+                    });
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        private void CopyFilePath_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button button || button.DataContext is not LargeFileVM file)
+            {
+                return;
+            }
+
+            var data = new DataPackage();
+            data.SetText(file.Path);
             Clipboard.SetContent(data);
         }
     }

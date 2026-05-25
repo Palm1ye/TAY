@@ -320,7 +320,7 @@ namespace TAY.Views
 
             _boostBtn = new Button
             {
-                Content = "[ Quick Boost ]",
+                Content = "Quick Boost",
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 FontSize = 11,
                 FontWeight = Microsoft.UI.Text.FontWeights.Bold,
@@ -336,7 +336,7 @@ namespace TAY.Views
 
             var openBtn = new Button
             {
-                Content = "[ Dashboard ]",
+                Content = "Dashboard",
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 FontSize = 11,
                 Height = 30,
@@ -543,7 +543,7 @@ namespace TAY.Views
             if (_boostBtn == null) return;
 
             _boostBtn.IsEnabled = false;
-            _boostBtn.Content = "[ Boosting... ]";
+            _boostBtn.Content = "Boosting...";
 
             System.Threading.Tasks.Task.Run(() =>
             {
@@ -555,11 +555,11 @@ namespace TAY.Views
                     UpdateStats();
                     if (clearedMB > 10)
                     {
-                        _boostBtn.Content = $"[ Cleared {clearedMB:F0} MB! ]";
+                        _boostBtn.Content = $"Cleared {clearedMB:F0} MB";
                     }
                     else
                     {
-                        _boostBtn.Content = "[ System Peak! ]";
+                        _boostBtn.Content = "System Peak";
                     }
 
                     // Reset after 3 seconds
@@ -572,7 +572,7 @@ namespace TAY.Views
                         resetTimer.Stop();
                         if (_boostBtn != null)
                         {
-                            _boostBtn.Content = "[ Quick Boost ]";
+                            _boostBtn.Content = "Quick Boost";
                             _boostBtn.IsEnabled = true;
                         }
                     };

@@ -14,16 +14,46 @@ namespace TAY.Views
             this.InitializeComponent();
         }
 
-        private void EnableAll_Click(object sender, RoutedEventArgs e)
+        private async void EnableAll_Click(object sender, RoutedEventArgs e)
         {
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "Enable all startup entries?",
+                Content = "This will mark every listed startup entry as enabled. Boot time may increase.",
+                PrimaryButtonText = "Enable all",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Close
+            };
+
+            if (await dialog.ShowAsync() != ContentDialogResult.Primary)
+            {
+                return;
+            }
+
             foreach (var app in ViewModel.Apps)
             {
                 app.IsEnabled = true;
             }
         }
 
-        private void DisableAll_Click(object sender, RoutedEventArgs e)
+        private async void DisableAll_Click(object sender, RoutedEventArgs e)
         {
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "Disable all startup entries?",
+                Content = "This will disable every listed startup entry that TAY can control. Security, driver, or sync utilities may stop launching automatically.",
+                PrimaryButtonText = "Disable all",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Close
+            };
+
+            if (await dialog.ShowAsync() != ContentDialogResult.Primary)
+            {
+                return;
+            }
+
             foreach (var app in ViewModel.Apps)
             {
                 app.IsEnabled = false;

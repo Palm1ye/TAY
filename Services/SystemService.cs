@@ -627,9 +627,19 @@ public class SystemService
     }
 
     // --- Top Processes ---
-    public static void KillProcess(int id)
+    public static bool KillProcess(int id)
     {
-        try { Process.GetProcessById(id).Kill(); } catch { }
+        try
+        {
+            var process = Process.GetProcessById(id);
+            process.Kill();
+            process.WaitForExit(3000);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
     public static List<ProcessInfo> GetTopProcesses(int count = 5)
     {

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Principal;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -17,6 +18,13 @@ namespace TAY.ViewModels
         public static SettingsViewModel Instance { get; } = new SettingsViewModel();
 
         private const string ReleaseApiUrl = "https://api.github.com/repos/Palm1ye/TAY/releases/latest";
+        private static readonly string AppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TAY");
+        private static readonly string[] ManagedBackupFiles =
+        {
+            "dns_backup.json",
+            "telemetry_backup.json",
+            "gamebooster_backup.json"
+        };
 
         private static readonly HttpClient Http = CreateHttpClient();
 
@@ -25,9 +33,16 @@ namespace TAY.ViewModels
 
         public string AppVersion { get; } = $"v{GetAppVersion()}";
         public string AppName => "TAY Optimizer";
+        public string AppChannel => "stable";
+        public string AppDataPath => AppDataDir;
+        public string RuntimeInfo => $".NET {Environment.Version} / {RuntimeInformationLabel}";
+        public string ElevationStatus => IsRunningAsAdministrator() ? "Administrator session active" : "Standard user session";
+        public string ArchitectureInfo => $"{RuntimeInformationLabel}, {Environment.ProcessorCount} logical processors";
 
         private SettingsViewModel()
         {
+            RefreshSystemSummary();
+            RefreshMaintenanceState();
         }
 
         public void BeginAutoCheck()
@@ -44,6 +59,11 @@ namespace TAY.ViewModels
         private bool _isDownloading;
         private string? _downloadUrl;
         private string? _releasePageUrl = "https://github.com/Palm1ye/TAY/releases/latest";
+        private string _windowsInfo = "Windows";
+        private string _hardwareSummary = "Hardware telemetry pending";
+        private string _backupStatus = "No managed backups found";
+        private string _backupFiles = "-";
+        private string _maintenanceStatus = "Ready";
 
         public string LatestVersion
         {
@@ -107,9 +127,131 @@ namespace TAY.ViewModels
             set => SetProperty(ref _releasePageUrl, value);
         }
 
+        public string WindowsInfo
+        {
+            get => _windowsInfo;
+            set => SetProperty(ref _windowsInfo, value);
+        }
+
+        public string HardwareSummary
+        {
+            get => _hardwareSummary;
+            set => SetProperty(ref _hardwareSummary, value);
+        }
+
+        public string BackupStatus
+        {
+            get => _backupStatus;
+            set => SetProperty(ref _backupStatus, value);
+        }
+
+        public string BackupFiles
+        {
+            get => _backupFiles;
+            set => SetProperty(ref _backupFiles, value);
+        }
+
+        public string MaintenanceStatus
+        {
+            get => _maintenanceStatus;
+            set => SetProperty(ref _maintenanceStatus, value);
+        }
+
         public bool IsNotChecking => !IsChecking;
         public bool IsNotDownloading => !IsDownloading;
         public bool CanDownloadUpdate => IsUpdateAvailable && !IsDownloading;
+
+        [RelayCommand]
+        private void RefreshSystemSummary()
+        {
+            try
+            {
+                var info = SystemService.GetHardwareInfo();
+                var os = info.TryGetValue("OS", out var osValue) ? osValue?.ToString() : "Windows";
+                var build = info.TryGetValue("OSBuild", out var buildValue) ? buildValue?.ToString() : "";
+                WindowsInfo = string.IsNullOrWhiteSpace(build) ? os ?? "Windows" : $"{os} build {build}";
+
+                var cpu = info.TryGetValue("CPU", out var cpuValue) ? cpuValue?.ToString() : "Unknown CPU";
+                var ram = info.TryGetValue("RAM", out var ramValue) ? $"{ramValue} GB RAM" : "RAM unknown";
+                var gpu = info.TryGetValue("GPU", out var gpuValue) ? gpuValue?.ToString() : "GPU unknown";
+                HardwareSummary = $"{cpu} / {ram} / {gpu}";
+                MaintenanceStatus = "System summary refreshed.";
+            }
+            catch (Exception ex)
+            {
+                MaintenanceStatus = $"System summary failed: {ex.Message}";
+            }
+        }
+
+        [RelayCommand]
+        private void RefreshMaintenanceState()
+        {
+            try
+            {
+                var files = new System.Collections.Generic.List<string>();
+                foreach (var name in ManagedBackupFiles)
+                {
+                    var path = Path.Combine(AppDataDir, name);
+                    if (!File.Exists(path)) continue;
+                    files.Add(name);
+                }
+
+                BackupFiles = files.Count == 0 ? "-" : string.Join(", ", files);
+                BackupStatus = files.Count == 0
+                    ? "No managed backups found"
+                    : $"{files.Count} restore backup file(s) available";
+            }
+            catch (Exception ex)
+            {
+                BackupStatus = "No restore backups found";
+                BackupFiles = "-";
+                MaintenanceStatus = $"Backup state could not be refreshed: {ex.Message}";
+            }
+        }
+
+        [RelayCommand]
+        private void OpenAppDataFolder()
+        {
+            try
+            {
+                Directory.CreateDirectory(AppDataDir);
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = AppDataDir,
+                    UseShellExecute = true
+                });
+                MaintenanceStatus = "Opened the local TAY data folder.";
+            }
+            catch (Exception ex)
+            {
+                MaintenanceStatus = $"Could not open app data: {ex.Message}";
+            }
+        }
+
+        [RelayCommand]
+        private void ClearLocalBackups()
+        {
+            try
+            {
+                var removed = 0;
+                foreach (var name in ManagedBackupFiles)
+                {
+                    var path = Path.Combine(AppDataDir, name);
+                    if (!File.Exists(path)) continue;
+                    File.Delete(path);
+                    removed++;
+                }
+
+                MaintenanceStatus = removed == 0
+                    ? "No local restore backups needed cleanup."
+                    : $"Removed {removed} local restore backup file(s).";
+                RefreshMaintenanceState();
+            }
+            catch (Exception ex)
+            {
+                MaintenanceStatus = $"Backup cleanup failed: {ex.Message}";
+            }
+        }
 
         [RelayCommand]
         private async Task CheckUpdatesAsync()
@@ -166,7 +308,7 @@ namespace TAY.ViewModels
                         _updateNotified = true;
                         TrayIconHelper.ShowBalloon(
                             "TAY Update Available",
-                            $"Yeni surum bulundu: {LatestVersion}. Ayarlar > Update Control'dan indirebilirsiniz."
+                            $"A new version is available: {LatestVersion}. Open Settings > Update Control to download it."
                         );
                     }
                 }
@@ -264,6 +406,23 @@ namespace TAY.ViewModels
             client.DefaultRequestHeaders.UserAgent.ParseAdd("TAY-Updater/1.0");
             client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
             return client;
+        }
+
+        private static string RuntimeInformationLabel =>
+            $"{System.Runtime.InteropServices.RuntimeInformation.OSArchitecture} / {System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture}";
+
+        private static bool IsRunningAsAdministrator()
+        {
+            try
+            {
+                using var identity = WindowsIdentity.GetCurrent();
+                var principal = new WindowsPrincipal(identity);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private static string GetAppVersion()

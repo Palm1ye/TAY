@@ -1,8 +1,8 @@
 ﻿; TAY System Optimizer - Inno Setup Script
-; Version: 0.1.1.2
+; Version: 0.2.0
 
 #define MyAppName "TAY System Optimizer"
-#define MyAppVersion "0.1.1.2"
+#define MyAppVersion "0.2.0"
 #define MyAppPublisher "Palm1ye"
 #define MyAppURL "https://github.com/Palm1ye/TAY"
 #define MyAppExeName "TAY.exe"

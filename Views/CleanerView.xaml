@@ -22,8 +22,8 @@
         
         <!-- Page Header -->
         <StackPanel Margin="4,0,4,16">
-            <TextBlock Text="CLEANER // STORAGE_RECLAIM" FontFamily="Consolas" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMuted}" CharacterSpacing="140"/>
-            <TextBlock Text="mem_flush.sh" FontFamily="Consolas" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextMain}" Margin="0,4,0,0"/>
+            <TextBlock Text="Temporary files and cache" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
+            <TextBlock Text="Cleaner" FontFamily="Segoe UI" FontSize="28" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,2,0,0"/>
         </StackPanel>
         
         <Grid Grid.Row="1">
@@ -41,8 +41,8 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="120"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="// CLEANUP PATHS" FontFamily="Consolas" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextMuted}" CharacterSpacing="80" Grid.Column="1" Margin="16,0,0,0"/>
-                        <TextBlock Text="// ACCUMULATED" FontFamily="Consolas" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextMuted}" CharacterSpacing="80" Grid.Column="2" HorizontalAlignment="Right"/>
+                        <TextBlock Text="Cleanup targets" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}" Grid.Column="1" Margin="16,0,0,0"/>
+                        <TextBlock Text="Size" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}" Grid.Column="2" HorizontalAlignment="Right"/>
                     </Grid>
                 </ListView.Header>
                 <ListView.ItemTemplate>
@@ -72,9 +72,9 @@
             <!-- Summary Bento Card -->
             <Border Style="{StaticResource SweetCard}" Grid.Column="1" VerticalAlignment="Top" Padding="20">
                 <StackPanel>
-                    <TextBlock Text="// CLEANUP SUMMARY" FontFamily="Consolas" FontSize="9" FontWeight="Bold" Foreground="{StaticResource TextMuted}" CharacterSpacing="80"/>
+                    <TextBlock Text="Cleanup Summary" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
                     
-                    <Grid Margin="0,16,0,24">
+                    <Grid Margin="0,16,0,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
@@ -83,17 +83,23 @@
                         <ProgressRing IsActive="{x:Bind ViewModel.IsScanning, Mode=OneWay}" Width="20" Height="20" Foreground="{StaticResource AccentMain}" Grid.Column="1" VerticalAlignment="Center"/>
                     </Grid>
 
+                    <StackPanel Margin="0,0,0,18" Spacing="4">
+                        <TextBlock Text="{x:Bind ViewModel.SelectedSize, Mode=OneWay}" FontFamily="Consolas" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AccentMain}"/>
+                        <TextBlock Text="{x:Bind ViewModel.SelectedCount, Mode=OneWay}" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
+                        <TextBlock Text="{x:Bind ViewModel.CleanupStatus, Mode=OneWay}" FontFamily="Segoe UI" FontSize="11" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                    </StackPanel>
+
                     <Grid Margin="0,0,0,12">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Button Content="[ select_all ]" Style="{StaticResource OutlineButton}" Click="SelectAll_Click" Grid.Column="0" Margin="0,0,8,0"/>
-                        <Button Content="[ clear_all ]" Style="{StaticResource OutlineButton}" Click="ClearAll_Click" Grid.Column="1" Margin="8,0,0,0"/>
+                        <Button Content="Select All" Style="{StaticResource OutlineButton}" Click="SelectAll_Click" Grid.Column="0" Margin="0,0,8,0"/>
+                        <Button Content="Clear All" Style="{StaticResource OutlineButton}" Click="ClearAll_Click" Grid.Column="1" Margin="8,0,0,0"/>
                     </Grid>
 
                     <StackPanel Margin="0,0,0,12" Visibility="{x:Bind ViewModel.IsCleaning, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <TextBlock Text="cleaning_in_progress" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource AccentDanger}"/>
+                        <TextBlock Text="cleanup_in_progress" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource AccentDanger}"/>
                         <ProgressBar IsIndeterminate="True" Height="2" Foreground="{StaticResource AccentDanger}" Background="#20F47C7C"/>
                     </StackPanel>
 
@@ -101,7 +107,7 @@
                     <Button Content="{x:Bind ViewModel.ScanButtonText, Mode=OneWay}" Command="{x:Bind ViewModel.ScanCommand}" IsEnabled="{x:Bind ViewModel.IsNotBusy, Mode=OneWay}" Style="{StaticResource SweetButton}" HorizontalAlignment="Stretch" Margin="0,0,0,12"/>
                     
                     <!-- Outlined/Soft Destructive Reclaim Button -->
-                    <Button Content="{x:Bind ViewModel.CleanButtonText, Mode=OneWay}" Command="{x:Bind ViewModel.CleanCommand}" IsEnabled="{x:Bind ViewModel.IsNotBusy, Mode=OneWay}" Style="{StaticResource DestructiveOutlineButton}" HorizontalAlignment="Stretch"/>
+                    <Button Content="{x:Bind ViewModel.CleanButtonText, Mode=OneWay}" Click="CleanSelected_Click" IsEnabled="{x:Bind ViewModel.IsNotBusy, Mode=OneWay}" Style="{StaticResource DestructiveOutlineButton}" HorizontalAlignment="Stretch"/>
                 </StackPanel>
             </Border>
         </Grid>

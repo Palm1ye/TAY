@@ -2,15 +2,15 @@
   <img src="Assets/tay.png" alt="TAY Logo" width="180"/>
 </p>
 
-<h1 align="center">TAY — System Optimizer</h1>
+<h1 align="center">TAY - System Optimizer</h1>
 
 <p align="center">
-  <strong>Version:</strong> v0.1.1.2
+  <strong>Version:</strong> v0.2.0
 </p>
 
 <p align="center">
-  <strong>A modern, native Windows system optimization &amp; monitoring tool.</strong><br/>
-  Built with WinUI 3 &amp; .NET 8 · Lightweight · Real-time Telemetry
+  <strong>A modern native Windows system optimization and monitoring tool.</strong><br/>
+  Built with WinUI 3 and .NET 8 · Lightweight · Real-time Telemetry · Guided Optimization
 </p>
 
 <p align="center">
@@ -22,133 +22,200 @@
 
 ---
 
-## 🛠️ Functional & Technical Architecture
+## Functional & Technical Architecture
 
-TAY is designed as a native Windows utility leveraging the **Windows App SDK** and **WinUI 3** to provide low-level system administration capabilities without heavy electron-based dependencies. Below is the technical breakdown of each functional module:
+TAY is designed as a native Windows utility using **Windows App SDK**, **WinUI 3**, and **.NET 8**. It provides real-time monitoring, guided cleanup, process control, startup management, disk analysis, and reversible system tuning without Electron-style overhead.
 
-### 📊 Real-Time Dashboard & Telemetry (`sys_overview.sh`)
-Provides real-time hardware telemetry and scheduling in a beautiful bento-box dashboard.
-*   **CPU Utilization Monitoring**: Tracked using C#'s `System.Diagnostics` performance counters, measuring processor time accurately across logical threads.
-*   **GPU Engine Tracking**: Polled from custom performance counters or DirectX device telemetry arrays to represent real-time engine load.
-*   **Memory Telemetry**: Analyzes physical RAM and calculates accurate heap allocations and committed bytes.
-*   **Interactive History Graph**: Visualized using a highly optimized, hardware-accelerated **LiveCharts2 (SkiaSharp)** cartesian chart showing rolling history vectors of CPU, RAM, and GPU.
-*   **Power Plan Engine**: Queries available system power plans using native Windows `powercfg` sub-commands/WMI calls and allows seamless, instant active plan switching.
-*   **🚀 Quick Boost Memory Sweep**: Executes a high-performance, background-threaded RAM sweep:
-    1. Forces deep .NET garbage collections (`GC.Collect()` and `GC.WaitForPendingFinalizers()`).
-    2. Invokes the native Windows kernel API `EmptyWorkingSet` via `psapi.dll` across active running processes.
-    3. Releases unused private working sets back to the operating system, instantly freeing up hundreds of megabytes of RAM.
+### Real-Time Dashboard & Telemetry
 
-### 💾 Disk Space Analyzer
-Deep-scans storage drives to locate capacity bottlenecks.
-*   **Multi-Threaded Directory Crawler**: Asynchronously scans the chosen drive partition utilizing C#'s `System.IO` APIs.
-*   **Visual Storage Categories**: Automatically categorizes files into **System Files**, **Applications**, **User Media** (images, videos, audio), and **Cache/Temp files**.
-*   **Top 50 Largest Files**: Automatically discovers and lists the 50 largest files on the system with full file paths and sizes, allowing you to instantly locate space-hogging archives, virtual machines, or log arrays.
+The dashboard is a bento-style command center for live system status.
 
-### ⚡ Startup Manager
-Optimizes boot times by cleaning up background programs.
-*   **Registry Registry Hive Inspection**: Scans standard Windows run locations:
-    - `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`
-    - `HKLM\Software\Microsoft\Windows\CurrentVersion\Run`
-*   **Startup Directory Polling**: Inspects user-specific and machine-wide standard Startup folders.
-*   **One-Click Toggle**: Allows you to instantly disable or re-enable items with simple registry mutations to decrease Windows boot latencies.
+* **CPU, RAM, GPU, and disk telemetry:** Live usage values with compact progress indicators.
+* **Telemetry history:** LiveCharts2/SkiaSharp chart for recent CPU, RAM, and GPU activity.
+* **Power plan control:** Reads and switches available Windows power plans through `powercfg`.
+* **Quick Boost:** Trims process working sets and performs a managed memory sweep for quick memory recovery.
+* **Hardware summary:** Shows CPU, GPU, RAM, motherboard, process count, disk status, and uptime.
 
-### 🧹 Deep System Cleaner
-Identifies and purges system junk to reclaim gigabytes of disk space.
-*   **Target Caches**: Scans and cleans:
-    - User Temp folders (`%TEMP%`) and System Temp directory (`C:\Windows\Temp`).
-    - Windows Prefetch cache (`C:\Windows\Prefetch`).
-    - Web browser temporary caches and cookie files.
-    - System error logs, memory crash dumps, and Windows Update download archives.
-*   **Safe Execution**: Features safe folder crawling to ensure active system lock files are bypassed without causing utility crashes.
+### Boost Tuning
 
-### 🖥️ Hardware Specification Dump
-Generates detailed hardware reports.
-*   **WMI (Windows Management Instrumentation) Queries**: Employs optimized `System.Management` queries to dump:
-    - Processor model name, physical cores, and architecture.
-    - Graphics card manufacturer and model.
-    - Installed physical memory capacity and architecture (e.g., DDR4/DDR5 detection).
-    - Motherboard baseboard manufacturer and model.
+Boost Tuning groups higher-impact maintenance tools into guided cards with realistic expectations.
 
-### 📋 Process Manager
-Monitors running processes.
-*   **Active Array Listing**: Pulls running processes with Process ID (PID), memory working set sizes, and active thread counts.
-*   **Unresponsive Killer**: Supports one-click termination of frozen or heavy system tasks using `Process.Kill()`.
+* **Privacy Shield:** Reduces Windows telemetry and assistant background activity with a reversible local backup.
+* **Game Focus Mode:** Temporarily pauses selected high-overhead services and raises known game process priority. Typical FPS impact is shown as an estimate, not a guarantee.
+* **Memory Sweep:** Reclaims memory from idle working sets and standby cache. Best used after long sessions or when stutter appears.
+* **Network Optimizer:** Flushes DNS, resets TCP/IP, scans DNS latency, and applies recommended DNS only after explicit confirmation.
+* **DNS safety warning:** TAY warns users not to apply recommended DNS if they use custom DNS for website-block bypassing, filtering, parental controls, ad blocking, or custom routing.
+* **Context Menu Manager:** Scans and toggles third-party shell extensions under right-click paths.
+* **Driver Status:** Scans signed drivers and flags outdated display/chipset-related components.
 
-### 🔧 Borderless System Tray Widget
-A premium floating mini-dashboard accessible from your taskbar tray.
-*   **Win32 Custom Borderless Shell**: Bypasses traditional WinUI window frame styling. Strips standard borders, minimize/maximize boxes, caption buttons, and resizing frames (`WS_CAPTION`, `WS_THICKFRAME`, `WS_BORDER`) using native `SetWindowLong` overrides.
-*   **Jitter-Free Dragging**: Custom cursor tracking using Win32 `GetCursorPos` in code-behind enables highly fluid dragging from any empty space of the card with zero jitter.
-*   **Quick Tools**: Includes live resource load gauges, a system uptime timer, and a dedicated **Quick Boost** button for rapid memory sweep actions.
+### Disk Space Analyzer
+
+Disk Analyzer helps identify storage pressure and locate large files.
+
+* **Drive cards:** Shows fixed drives with free/used capacity and a scan action.
+* **Visual Storage Map:** Categorizes scanned files into System, Applications, User Media, Cache & Temp, and Other files.
+* **Largest files list:** Displays large detected files with size, full path, copy-path action, and Explorer location opening.
+* **Guided empty states:** Explains what to do before a scan and what the visual map represents after analysis.
+
+### Startup Manager
+
+Startup Manager helps review and control programs that launch with Windows.
+
+* **Registry inspection:** Reads startup entries from standard Windows Run registry locations.
+* **Status toggles:** Enables or disables supported startup items.
+* **Sorting controls:** Sort by recommended order, app name, impact, enabled-first, or disabled-first.
+* **Guidance text:** Explains which view is useful and warns users to disable only entries they recognize.
+
+### Cleaner
+
+Cleaner identifies temporary and cache-heavy locations.
+
+* **Cleanup targets:** Windows Temp, user Temp, browser cache locations, Prefetch, and Recycle Bin.
+* **Selected-size summary:** Shows selected cleanup size and target count before cleaning.
+* **Confirmation before deletion:** TAY asks for confirmation before removing files.
+* **Safe execution:** Locked files are skipped and cleanup status is reported after the operation.
+
+### Hardware
+
+Hardware view collects detailed local system information.
+
+* **Processor:** CPU name, core count, logical threads, and clock speed.
+* **Graphics:** GPU name, dedicated VRAM, shared memory, and total graphics memory.
+* **Memory:** Installed RAM capacity and memory architecture.
+* **System:** Motherboard, operating system, build information, and platform details.
+
+### Process Manager
+
+Process Manager provides a safer view of active processes.
+
+* **Search:** Filter processes by name.
+* **Sorting:** Sort by RAM high-to-low, RAM low-to-high, name A-Z, or name Z-A.
+* **Protected process handling:** Critical Windows processes are labeled and protected from accidental termination.
+* **Confirmation before End Task:** TAY asks before forcing a process to exit.
+
+### Settings & Diagnostics
+
+Settings is the maintenance hub for the application.
+
+* **Application info:** Version, channel, privilege status, runtime, and architecture.
+* **System snapshot:** OS, CPU, RAM, GPU, and diagnostics copy action.
+* **Update control:** GitHub release check, installer download, and release page opening.
+* **Local maintenance:** App data folder access, backup-state refresh, and local backup cleanup.
+* **Safety model:** Documents which high-impact operations require confirmation.
+
+### Borderless System Tray Widget
+
+The tray widget provides quick access to live resource status.
+
+* **Compact telemetry:** CPU, memory, and GPU status.
+* **Quick Boost:** Runs the same memory recovery action from the tray.
+* **Dashboard shortcut:** Opens the main application window.
+* **Borderless Win32 shell:** Uses native window styling for a compact floating panel.
 
 ---
 
-## 🚀 Installation
+## Installation
 
-### Quick Install (Recommended)
-1. Go to the [**Releases**](https://github.com/Palm1ye/TAY/releases/latest) page.
+### Quick Install
+
+1. Go to the [Releases](https://github.com/Palm1ye/TAY/releases/latest) page.
 2. Download `TAY_Setup.exe`.
-3. Run the installer and follow the quick prompts.
-4. Launch TAY from your Desktop or Start Menu.
+3. Run the installer.
+4. Launch TAY from the Start Menu or desktop shortcut.
 
 ### Portable Zip
-1. Download the `.zip` archive from [**Releases**](https://github.com/Palm1ye/TAY/releases/latest).
-2. Extract to any folder.
-3. Run `TAY.exe` directly.
+
+1. Download the portable `.zip` archive from [Releases](https://github.com/Palm1ye/TAY/releases/latest), if available.
+2. Extract it to any folder.
+3. Run `TAY.exe`.
 
 ---
 
-## 🛠️ Build from Source
+## Build from Source
 
 ### Prerequisites
+
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- [Windows App SDK 1.5](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/)
-- Windows 10 (build 17763) or later
-- [Inno Setup 6](https://jrsoftware.org/isdl.php) (optional, for compiling the installer)
+- Windows 10 build 17763 or later
+- Windows 11 recommended
+- [Inno Setup 6](https://jrsoftware.org/isdl.php) for installer packaging
 
 ### Build & Run
-```bash
-git clone https://github.com/Palm1ye/TAY.git
-cd TAY
+
+Debug build for the default output folder:
+
+```powershell
+dotnet build -p:Platform=x64
+```
+
+Runtime-specific Debug build:
+
+```powershell
 dotnet build -r win-x64 -p:Platform=x64
+```
+
+Run from source:
+
+```powershell
 dotnet run -r win-x64 -p:Platform=x64
 ```
 
 ### Publish & Package
-TAY using Inno Setup for compiling the installer:
+
+Build the installer:
 
 ```powershell
-# Run the automated packaging pipeline
-./build_setup.ps1
+.\build_setup.ps1
 ```
 
-If you prefer to publish manually without Inno Setup:
-```bash
-dotnet publish -c Release -r win-x64 -p:Platform=x64 --self-contained false
+Manual Release publish:
+
+```powershell
+dotnet publish -c Release -r win-x64 -p:Platform=x64 --self-contained true
 ```
-The raw binaries will be generated in `bin/x64/Release/net8.0-windows10.0.19041.0/win-x64/publish/`.
+
+Release binaries are generated under:
+
+```text
+bin\x64\Release\net8.0-windows10.0.19041.0\win-x64\publish\
+```
+
+Installer output:
+
+```text
+Output\TAY_Setup.exe
+```
 
 ---
 
+## Safety Notes
 
-## 🧩 Tech Stack
+TAY intentionally performs administrator-level operations for several system tools. Review prompts carefully before applying DNS changes, resetting TCP/IP, disabling startup entries, ending processes, clearing cache folders, or changing tuning settings.
+
+For DNS optimization specifically: do not apply TAY's recommended DNS profile if you already use a DNS service for website-block bypassing, filtering, parental controls, ad blocking, private routing, or organization-managed network policy.
+
+---
+
+## Tech Stack
 
 | Component | Technology |
-|-----------|-----------|
-| UI Framework | WinUI 3 (Windows App SDK 1.5) |
+|-----------|------------|
+| UI Framework | WinUI 3 |
 | Runtime | .NET 8 |
-| Architecture | MVVM (CommunityToolkit.Mvvm) |
-| Charts | LiveCharts2 (SkiaSharp) |
-| System Info | WMI (System.Management) |
-| Performance | PerformanceCounters & Win32 APIs |
+| Architecture | MVVM with CommunityToolkit.Mvvm |
+| Charts | LiveCharts2 / SkiaSharp |
+| System Info | WMI / System.Management |
+| Performance | Performance Counters and Win32 APIs |
+| Installer | Inno Setup |
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
 
 ---
 
 <p align="center">
-  <sub>Made with ❤️ by <a href="https://github.com/Palm1ye">Palm1ye</a></sub>
+  <sub>Made by <a href="https://github.com/Palm1ye">Palm1ye</a></sub>
 </p>

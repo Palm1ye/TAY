@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -11,6 +12,20 @@ namespace TAY.ViewModels
     public partial class StartupViewModel : ObservableObject
     {
         public ObservableCollection<StartupAppVM> Apps { get; } = new();
+        public string[] SortOptions { get; } =
+        {
+            "Recommended",
+            "Name A-Z",
+            "Impact High-Low",
+            "Enabled First",
+            "Disabled First"
+        };
+
+        [ObservableProperty]
+        private string selectedSort = "Recommended";
+
+        [ObservableProperty]
+        private string guidance = "Start with high-impact enabled apps. Disable only items you recognize.";
 
         private readonly Microsoft.UI.Dispatching.DispatcherQueue _dispatcher;
 
@@ -25,20 +40,20 @@ namespace TAY.ViewModels
             var apps = await Task.Run(() => SystemService.GetStartupApps());
             _dispatcher?.TryEnqueue(() =>
             {
-                var sorted = apps
-                    .OrderByDescending(a => a.Enabled)
-                    .ThenByDescending(a => StartupAppVM.GetImpactRank(a.Impact))
-                    .ThenBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
-                    .ToList();
-
                 Apps.Clear();
-                foreach (var a in sorted)
+                foreach (var a in apps)
                 {
                     var vm = new StartupAppVM(a);
                     vm.PropertyChanged += App_PropertyChanged;
                     Apps.Add(vm);
                 }
+                ApplySort();
             });
+        }
+
+        partial void OnSelectedSortChanged(string value)
+        {
+            ApplySort();
         }
 
         private void App_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -53,11 +68,23 @@ namespace TAY.ViewModels
         {
             _dispatcher?.TryEnqueue(() =>
             {
-                var sorted = Apps
-                    .OrderByDescending(a => a.IsEnabled)
-                    .ThenByDescending(a => a.ImpactRank)
-                    .ThenBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
-                    .ToList();
+                var sorted = SelectedSort switch
+                {
+                    "Name A-Z" => Apps.OrderBy(a => a.Name, StringComparer.OrdinalIgnoreCase).ToList(),
+                    "Impact High-Low" => Apps.OrderByDescending(a => a.ImpactRank).ThenBy(a => a.Name, StringComparer.OrdinalIgnoreCase).ToList(),
+                    "Enabled First" => Apps.OrderByDescending(a => a.IsEnabled).ThenBy(a => a.Name, StringComparer.OrdinalIgnoreCase).ToList(),
+                    "Disabled First" => Apps.OrderBy(a => a.IsEnabled).ThenBy(a => a.Name, StringComparer.OrdinalIgnoreCase).ToList(),
+                    _ => Apps.OrderByDescending(a => a.IsEnabled).ThenByDescending(a => a.ImpactRank).ThenBy(a => a.Name, StringComparer.OrdinalIgnoreCase).ToList()
+                };
+
+                Guidance = SelectedSort switch
+                {
+                    "Impact High-Low" => "Highest impact items are listed first. These usually matter most for boot time.",
+                    "Disabled First" => "Disabled entries are grouped first so you can quickly restore something you need.",
+                    "Enabled First" => "Enabled entries are grouped first so you can review what currently launches with Windows.",
+                    "Name A-Z" => "Alphabetical view is useful when you are looking for a specific app.",
+                    _ => "Recommended view prioritizes enabled and high-impact entries."
+                };
 
                 for (int targetIndex = 0; targetIndex < sorted.Count; targetIndex++)
                 {
@@ -69,6 +96,24 @@ namespace TAY.ViewModels
                     }
                 }
             });
+        }
+
+        [RelayCommand]
+        private void SortByName()
+        {
+            SelectedSort = "Name A-Z";
+        }
+
+        [RelayCommand]
+        private void SortByImpact()
+        {
+            SelectedSort = "Impact High-Low";
+        }
+
+        [RelayCommand]
+        private void SortByEnabled()
+        {
+            SelectedSort = SelectedSort == "Enabled First" ? "Disabled First" : "Enabled First";
         }
     }
 

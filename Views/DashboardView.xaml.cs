@@ -54,16 +54,16 @@ namespace TAY.Views
             _quickBoostRunning = true;
 
             QuickBoostBtn.IsEnabled = false;
-            QuickBoostBtn.Content = "[ boosting... ]";
+            QuickBoostBtn.Content = "Boosting...";
 
             QuickBoostDialog.XamlRoot = this.XamlRoot;
             QuickBoostDialog.IsPrimaryButtonEnabled = false;
             QuickBoostRing.IsActive = true;
             QuickBoostStatusText.Text = "Boosting...";
             QuickBoostSummaryText.Text = "";
-            QuickBoostStep1.Text = "[ ... ] Sweeping managed heap";
-            QuickBoostStep2.Text = "[ ... ] Trimming working sets";
-            QuickBoostStep3.Text = "[ ... ] Finalizing report";
+            QuickBoostStep1.Text = "Preparing managed memory sweep";
+            QuickBoostStep2.Text = "Waiting to trim working sets";
+            QuickBoostStep3.Text = "Waiting to finalize report";
             _ = QuickBoostDialog.ShowAsync();
 
             QuickBoostReport report;
@@ -80,8 +80,8 @@ namespace TAY.Views
 
                         this.DispatcherQueue.TryEnqueue(() =>
                         {
-                            QuickBoostStep1.Text = "[ ok ] Sweeping managed heap";
-                            QuickBoostStep2.Text = "[ ... ] Trimming working sets";
+                            QuickBoostStep1.Text = "Managed memory sweep complete";
+                            QuickBoostStep2.Text = "Trimming process working sets";
                         });
 
                         var processes = System.Diagnostics.Process.GetProcesses();
@@ -105,15 +105,15 @@ namespace TAY.Views
 
                         this.DispatcherQueue.TryEnqueue(() =>
                         {
-                            QuickBoostStep2.Text = "[ ok ] Trimming working sets";
-                            QuickBoostStep3.Text = "[ ... ] Finalizing report";
+                            QuickBoostStep2.Text = "Working set trim complete";
+                            QuickBoostStep3.Text = "Finalizing report";
                         });
                     }
                     catch { }
 
                     this.DispatcherQueue.TryEnqueue(() =>
                     {
-                        QuickBoostStep3.Text = "[ ok ] Finalizing report";
+                        QuickBoostStep3.Text = "Report finalized";
                     });
 
                     return localReport;
@@ -121,7 +121,7 @@ namespace TAY.Views
             }
             catch
             {
-                QuickBoostBtn.Content = "[ quick_boost ]";
+                QuickBoostBtn.Content = "Quick Boost";
                 QuickBoostBtn.IsEnabled = true;
                 _quickBoostRunning = false;
                 return;
@@ -144,11 +144,11 @@ namespace TAY.Views
             {
                 if (clearedMB > 10)
                 {
-                    QuickBoostBtn.Content = $"[ cleared {clearedMB:F0} MB! ]";
+                    QuickBoostBtn.Content = $"Cleared {clearedMB:F0} MB";
                 }
                 else
                 {
-                    QuickBoostBtn.Content = "[ system peak! ]";
+                    QuickBoostBtn.Content = "System Peak";
                 }
 
                 var resetTimer = new Microsoft.UI.Xaml.DispatcherTimer
@@ -158,7 +158,7 @@ namespace TAY.Views
                 resetTimer.Tick += (s, ev) =>
                 {
                     resetTimer.Stop();
-                    QuickBoostBtn.Content = "[ quick_boost ]";
+                    QuickBoostBtn.Content = "Quick Boost";
                     QuickBoostBtn.IsEnabled = true;
                     _quickBoostRunning = false;
                 };

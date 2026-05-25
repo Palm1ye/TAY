@@ -40,6 +40,8 @@ detailed_build.log
 ## Test files
 test_input.json
 run_log.txt
+scratch/
+*.orig
 
 ## Rider / JetBrains
 .idea/
@@ -67,3 +69,6 @@ $RECYCLE.BIN/
 ## Installer output
 Output/
 TAY_Setup.exe
+build_output.txt
+build_output_utf8.txt
+build_log.txt
