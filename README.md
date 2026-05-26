@@ -4,9 +4,6 @@
 
 <h1 align="center">TAY - System Optimizer</h1>
 
-<p align="center">
-  <strong>Version:</strong> v0.3.0
-</p>
 
 <p align="center">
   <strong>A modern native Windows system optimization and monitoring tool.</strong><br/>
