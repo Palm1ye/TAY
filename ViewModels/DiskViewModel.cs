@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -104,40 +106,49 @@ namespace TAY.ViewModels
 
             Task.Run(() =>
             {
-                var filesList = new System.Collections.Generic.List<FileInfo>();
+                var topFiles = new List<FileInfo>();
                 long systemFiles = 0;
                 long applications = 0;
                 long userMedia = 0;
                 long cacheTemp = 0;
                 long otherFiles = 0;
-                var stack = new System.Collections.Generic.Stack<(string path, int depth)>();
-                stack.Push(($"{driveLetter}:\\", 0));
+                long scannedFiles = 0;
+                int skippedDirectories = 0;
+                var stack = new Stack<string>();
+                stack.Push($"{driveLetter}:\\");
 
                 int processedDirectories = 0;
-                int maxFilesLimit = 120000;
-                int maxDepth = 8;
-
-                while (stack.Count > 0 && filesList.Count < maxFilesLimit)
+                var options = new EnumerationOptions
                 {
-                    var (currentPath, depth) = stack.Pop();
-                    if (depth > maxDepth) continue;
+                    IgnoreInaccessible = true,
+                    RecurseSubdirectories = false,
+                    ReturnSpecialDirectories = false,
+                    AttributesToSkip = FileAttributes.ReparsePoint
+                };
+
+                while (stack.Count > 0)
+                {
+                    var currentPath = stack.Pop();
 
                     try
                     {
                         var dir = new DirectoryInfo(currentPath);
                         if ((dir.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint)
-                            continue; // Skip junction points/symbolic links to prevent circular loops
-
-                        string dirName = dir.Name.ToLowerInvariant();
-                        if (dirName == "system volume information" || dirName == "$winreagent")
                             continue;
 
-                        // Enumerate files
-                        foreach (var f in dir.EnumerateFiles())
+                        string dirName = dir.Name.ToLowerInvariant();
+                        if (dirName == "system volume information")
+                        {
+                            skippedDirectories++;
+                            continue;
+                        }
+
+                        foreach (var f in dir.EnumerateFiles("*", options))
                         {
                             try
                             {
-                                filesList.Add(f);
+                                scannedFiles++;
+                                AddTopFile(topFiles, f, 50);
                                 switch (ClassifyStorageFile(f))
                                 {
                                     case StorageCategory.System:
@@ -160,25 +171,24 @@ namespace TAY.ViewModels
                             catch { }
                         }
 
-                        foreach (var d in dir.EnumerateDirectories())
+                        foreach (var d in dir.EnumerateDirectories("*", options))
                         {
                             try
                             {
-                                if ((d.Attributes & FileAttributes.ReparsePoint) != FileAttributes.ReparsePoint &&
-                                    ShouldEnterDirectory(d.FullName, depth + 1, maxDepth))
+                                if ((d.Attributes & FileAttributes.ReparsePoint) != FileAttributes.ReparsePoint)
                                 {
-                                    stack.Push((d.FullName, depth + 1));
+                                    stack.Push(d.FullName);
                                 }
                             }
-                            catch { }
+                            catch { skippedDirectories++; }
                         }
                     }
-                    catch { }
+                    catch { skippedDirectories++; }
 
                     processedDirectories++;
                     if (processedDirectories % 150 == 0)
                     {
-                        string status = $"Scanning... mapped {processedDirectories} folders, found {filesList.Count} files.";
+                        string status = $"Full scan... mapped {processedDirectories:N0} folders, found {scannedFiles:N0} files.";
                         long currentSystem = systemFiles;
                         long currentApplications = applications;
                         long currentUserMedia = userMedia;
@@ -199,16 +209,16 @@ namespace TAY.ViewModels
                     }
                 }
 
-                var topFiles = filesList.OrderByDescending(f => f.Length).Take(50).ToList();
+                var largestFiles = topFiles.OrderByDescending(f => f.Length).ToList();
 
                 _dispatcher?.TryEnqueue(() =>
                 {
-                    foreach (var f in topFiles)
+                    foreach (var f in largestFiles)
                         LargeFiles.Add(new LargeFileVM(f));
                     HasLargeFiles = LargeFiles.Count > 0;
-                    ScanStatus = filesList.Count >= maxFilesLimit
-                        ? $"Scan capped at {maxFilesLimit:N0} files after {processedDirectories:N0} folders. Showing top 50 largest files."
-                        : $"Scan complete. Processed {processedDirectories:N0} folders. Showing top 50 largest files.";
+                    ScanStatus = skippedDirectories > 0
+                        ? $"Full scan complete. Processed {processedDirectories:N0} folders / {scannedFiles:N0} files. Skipped {skippedDirectories:N0} protected folders."
+                        : $"Full scan complete. Processed {processedDirectories:N0} folders / {scannedFiles:N0} files.";
                     SystemFilesSize = SystemService.FormatBytes(systemFiles);
                     ApplicationsSize = SystemService.FormatBytes(applications);
                     UserMediaSize = SystemService.FormatBytes(userMedia);
@@ -231,22 +241,27 @@ namespace TAY.ViewModels
             Other
         }
 
-        private static bool ShouldEnterDirectory(string path, int depth, int maxDepth)
+        private static void AddTopFile(List<FileInfo> topFiles, FileInfo file, int limit)
         {
-            var lower = path.ToLowerInvariant();
-            if (depth > maxDepth) return false;
-
-            if (lower.Contains("\\windows\\winsxs\\") ||
-                lower.Contains("\\windows\\servicing\\") ||
-                lower.Contains("\\windows\\system32\\driverstore\\filerepository\\") ||
-                lower.Contains("\\appdata\\local\\packages\\") ||
-                lower.Contains("\\node_modules\\") ||
-                lower.Contains("\\.git\\"))
+            if (topFiles.Count < limit)
             {
-                return false;
+                topFiles.Add(file);
+                return;
             }
 
-            return true;
+            var smallestIndex = 0;
+            var smallestLength = topFiles[0].Length;
+            for (var i = 1; i < topFiles.Count; i++)
+            {
+                if (topFiles[i].Length >= smallestLength) continue;
+                smallestLength = topFiles[i].Length;
+                smallestIndex = i;
+            }
+
+            if (file.Length > smallestLength)
+            {
+                topFiles[smallestIndex] = file;
+            }
         }
 
         private static StorageCategory ClassifyStorageFile(FileInfo file)

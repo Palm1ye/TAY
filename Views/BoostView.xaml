@@ -346,21 +346,28 @@
                         <TextBlock Grid.Row="1" Text="drivers need review" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="34,8,0,8"/>
                         <Border Grid.Row="2" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="5" Background="{StaticResource RowBg}">
                             <ListView ItemsSource="{Binding Drivers}" SelectionMode="None" Background="Transparent" BorderThickness="0" Padding="0">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                        <Setter Property="MinHeight" Value="0"/>
+                                        <Setter Property="Padding" Value="0"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
-                                        <Border BorderThickness="0,0,0,1" BorderBrush="{StaticResource RowBorder}" Padding="8,6">
-                                            <Grid>
+                                        <Border BorderThickness="0,0,0,1" BorderBrush="{StaticResource RowBorder}" Padding="10,8" HorizontalAlignment="Stretch">
+                                            <Grid RowSpacing="7">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
-                                                <StackPanel Margin="0,0,10,0">
-                                                    <TextBlock Text="{Binding DeviceName}" FontFamily="Consolas" FontSize="10.5" FontWeight="Bold" Foreground="{StaticResource TextMain}" TextTrimming="CharacterEllipsis"/>
-                                                    <TextBlock Text="{Binding DeviceClass}" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource AccentInfo}" TextTrimming="CharacterEllipsis"/>
-                                                    <TextBlock Text="{Binding Provider}" FontFamily="Consolas" FontSize="8.5" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
-                                                    <TextBlock Text="{Binding Suggestion}" FontSize="9" Foreground="{StaticResource TextDim}" TextWrapping="Wrap"/>
-                                                </StackPanel>
-                                                <StackPanel Grid.Column="1" VerticalAlignment="Center" MinWidth="78">
+                                                <TextBlock Text="{Binding DeviceName}" FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" TextWrapping="WrapWholeWords" Margin="0,0,10,0"/>
+                                                <StackPanel Grid.Column="1" Grid.RowSpan="2" VerticalAlignment="Top" MinWidth="82">
                                                     <Border Background="#18F2C66D" BorderBrush="#34F2C66D" BorderThickness="1" CornerRadius="4" Padding="6,3" Visibility="{Binding IsOutdated, Converter={StaticResource BoolToVisibilityConverter}}">
                                                         <TextBlock Text="{Binding StatusLabel}" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource AccentWarning}" HorizontalAlignment="Center"/>
                                                     </Border>
@@ -369,6 +376,17 @@
                                                     </Border>
                                                     <TextBlock Text="{Binding DateLabel}" FontFamily="Consolas" FontSize="8.5" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center" Margin="0,4,0,0"/>
                                                 </StackPanel>
+                                                <Grid Grid.Row="1" ColumnSpacing="6" Margin="0,0,10,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border Background="#147AA7FF" BorderBrush="#307AA7FF" BorderThickness="1" CornerRadius="4" Padding="6,3">
+                                                        <TextBlock Text="{Binding DeviceClass}" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource AccentInfo}"/>
+                                                    </Border>
+                                                    <TextBlock Grid.Column="1" Text="{Binding Provider}" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource TextMuted}" TextWrapping="WrapWholeWords" VerticalAlignment="Center"/>
+                                                </Grid>
+                                                <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Suggestion}" FontSize="9.5" Foreground="{StaticResource TextDim}" TextWrapping="WrapWholeWords"/>
                                             </Grid>
                                         </Border>
                                     </DataTemplate>

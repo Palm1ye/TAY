@@ -38,7 +38,6 @@ namespace TAY
             }
 
             m_window = new MainWindow();
-            m_window.Closed += (s, e) => { ExitApplication(); };
             m_window.Activate();
 
             SettingsViewModel.Instance.BeginAutoCheck();
@@ -86,6 +85,14 @@ namespace TAY
         {
             try { _flyoutWindow?.Close(); } catch { }
             try { TrayIconHelper.Shutdown(); } catch { }
+            try
+            {
+                if (m_window is MainWindow mainWindow)
+                {
+                    mainWindow.AllowClose = true;
+                }
+            }
+            catch { }
             try { m_window?.Close(); } catch { }
             try { this.Exit(); } catch { }
         }

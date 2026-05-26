@@ -66,9 +66,9 @@
 
             <Border Style="{StaticResource SweetCard}" Grid.Column="2" Padding="16,14">
                 <StackPanel Spacing="4">
-                    <TextBlock Text="Graphics memory" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}"/>
-                    <TextBlock Text="{x:Bind ViewModel.TotalVram, Mode=OneWay}" FontFamily="Consolas" FontSize="27" FontWeight="Bold" Foreground="{StaticResource AccentInfo}"/>
-                    <TextBlock Text="{x:Bind ViewModel.DedicatedVram, Mode=OneWay}" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="VRAM" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock Text="{x:Bind ViewModel.DedicatedVram, Mode=OneWay}" FontFamily="Consolas" FontSize="27" FontWeight="Bold" Foreground="{StaticResource AccentInfo}"/>
+                    <TextBlock Text="{x:Bind ViewModel.GpuName, Mode=OneWay}" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
             </Border>
         </Grid>

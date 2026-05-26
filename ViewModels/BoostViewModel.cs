@@ -72,7 +72,30 @@ namespace TAY.ViewModels
             new("Valorant", "VALORANT-Win64-Shipping.exe"),
             new("Fortnite", "FortniteClient-Win64-Shipping.exe"),
             new("League of Legends", "League of Legends.exe"),
-            new("Overwatch", "Overwatch.exe")
+            new("Overwatch", "Overwatch.exe"),
+            new("Apex Legends", "r5apex.exe"),
+            new("Call of Duty / Warzone", "cod.exe"),
+            new("Rainbow Six Siege", "RainbowSix.exe"),
+            new("PUBG", "TslGame.exe"),
+            new("Escape from Tarkov", "EscapeFromTarkov.exe"),
+            new("Minecraft", "javaw.exe / Minecraft.Windows.exe"),
+            new("Roblox", "RobloxPlayerBeta.exe"),
+            new("Elden Ring", "eldenring.exe"),
+            new("Red Dead Redemption 2", "RDR2.exe"),
+            new("Forza Horizon", "ForzaHorizon5.exe"),
+            new("Hogwarts Legacy", "HogwartsLegacy.exe"),
+            new("Starfield", "Starfield.exe"),
+            new("THE FINALS", "Discovery.exe"),
+            new("Dead by Daylight", "DeadByDaylight-Win64-Shipping.exe"),
+            new("Palworld", "Palworld-Win64-Shipping.exe"),
+            new("Helldivers 2", "Helldivers2.exe"),
+            new("Warframe", "Warframe.x64.exe"),
+            new("Path of Exile", "PathOfExile_x64Steam.exe"),
+            new("Diablo IV", "Diablo IV.exe"),
+            new("World of Warcraft", "Wow.exe"),
+            new("Final Fantasy XIV", "ffxiv_dx11.exe"),
+            new("Genshin Impact", "GenshinImpact.exe"),
+            new("EA Sports FC", "FC24.exe / FC25.exe")
         };
 
         private DnsOption? _recommendedDns;

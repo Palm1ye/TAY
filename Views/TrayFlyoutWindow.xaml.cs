@@ -10,6 +10,7 @@ using TAY.Services;
 using Windows.UI;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace TAY.Views
 {
@@ -26,7 +27,14 @@ namespace TAY.Views
         private ProgressBar? _gpuProgress;
         private TextBlock? _uptimeText;
         private TextBlock? _statusText;
+        private Border? _rootBorder;
         private Button? _boostBtn;
+        private Button? _gameModeBtn;
+        private Button? _dnsBtn;
+        private Button? _transparentBtn;
+        private bool _isTransparentMode;
+        private readonly Brush _solidFlyoutBackground = new SolidColorBrush(Color.FromArgb(232, 17, 21, 28));
+        private readonly Brush _transparentFlyoutBackground = new SolidColorBrush(Colors.Transparent);
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
@@ -119,249 +127,331 @@ namespace TAY.Views
 
         private void BuildUI()
         {
-            // Organic Theme Palette Matching App.xaml
-            var accentMain = new SolidColorBrush(Color.FromArgb(255, 74, 234, 220)); // #4AEADC (Teal-Cyan)
-            var accentWarning = new SolidColorBrush(Color.FromArgb(255, 242, 198, 109)); // #F2C66D (Sunset Gold)
-            var textMain = new SolidColorBrush(Color.FromArgb(255, 232, 237, 243)); // #E8EDF3
-            var textDim = new SolidColorBrush(Color.FromArgb(255, 136, 153, 170)); // #8899AA
+            var accentMain = new SolidColorBrush(Color.FromArgb(255, 88, 213, 201));
+            var accentInfo = new SolidColorBrush(Color.FromArgb(255, 122, 167, 255));
+            var accentWarning = new SolidColorBrush(Color.FromArgb(255, 242, 198, 109));
+            var accentDanger = new SolidColorBrush(Color.FromArgb(255, 244, 124, 124));
+            var textMain = new SolidColorBrush(Color.FromArgb(255, 244, 244, 245));
+            var textDim = new SolidColorBrush(Color.FromArgb(255, 161, 161, 170));
 
-            var grid = new Grid { Background = new SolidColorBrush(Colors.Transparent) };
-
-            // Rounded Space-Blue Outer Card Border (Whole body is now draggable)
+            var root = new Grid { Background = new SolidColorBrush(Colors.Transparent) };
             var border = new Border
             {
-                Background = new SolidColorBrush(Color.FromArgb(255, 13, 27, 42)), // #0D1B2A Navy Blue
-                CornerRadius = new CornerRadius(16),
+                Background = _solidFlyoutBackground,
+                CornerRadius = new CornerRadius(8),
                 BorderThickness = new Thickness(1),
-                BorderBrush = new SolidColorBrush(Color.FromArgb(50, 74, 234, 220)), // Subtle cyan border
-                Padding = new Thickness(18),
+                BorderBrush = new SolidColorBrush(Color.FromArgb(58, 255, 255, 255)),
+                Padding = new Thickness(14),
                 Margin = new Thickness(2)
             };
+            _rootBorder = border;
             border.PointerPressed += Border_PointerPressed;
             border.PointerMoved += Border_PointerMoved;
             border.PointerReleased += Border_PointerReleased;
 
-            var mainStack = new StackPanel { Spacing = 14 };
+            var main = new StackPanel { Spacing = 10 };
 
-            // --- Header Segment ---
-            var headerGrid = new Grid
-            {
-                Background = new SolidColorBrush(Colors.Transparent)
-            };
-            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            var header = new Grid();
+            header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            header.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-            var logoStack = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-            
-            var iconBorder = new Border
+            var iconFrame = new Border
             {
-                Background = new SolidColorBrush(Color.FromArgb(25, 74, 234, 220)),
-                CornerRadius = new CornerRadius(6),
-                Width = 20,
-                Height = 20
+                Width = 34,
+                Height = 34,
+                CornerRadius = new CornerRadius(7),
+                BorderBrush = new SolidColorBrush(Color.FromArgb(90, 122, 167, 255)),
+                BorderThickness = new Thickness(1),
+                Background = new SolidColorBrush(Color.FromArgb(48, 122, 167, 255))
             };
-            
-            var appLogo = new Image
+            iconFrame.Child = new Image
             {
-                Width = 18,
-                Height = 18,
+                Width = 25,
+                Height = 25,
+                HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
                 Source = new Microsoft.UI.Xaml.Media.Imaging.SvgImageSource(new Uri("ms-appx:///Assets/tay.svg"))
             };
-            iconBorder.Child = appLogo;
 
-            var titleText = new TextBlock
+            var title = new TextBlock
             {
-                Text = "TAY STATUS",
-                FontFamily = new FontFamily("Consolas"),
-                FontWeight = Microsoft.UI.Text.FontWeights.Bold,
-                FontSize = 11,
-                Foreground = accentMain,
-                VerticalAlignment = VerticalAlignment.Center
+                Text = "TAY Control Mini",
+                FontSize = 20,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                Foreground = textMain,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(10, 0, 0, 0)
             };
-            
-            logoStack.Children.Add(iconBorder);
-            logoStack.Children.Add(titleText);
 
-            // Sleek Close Button
             var closeBtn = new Button
             {
-                Content = new FontIcon { Glyph = "\uE711", FontSize = 9, Foreground = textDim },
-                Width = 20,
-                Height = 20,
+                Content = new FontIcon { Glyph = "\uE711", FontSize = 16, Foreground = textDim },
+                Width = 30,
+                Height = 30,
                 Padding = new Thickness(0),
                 Background = new SolidColorBrush(Colors.Transparent),
                 BorderThickness = new Thickness(0),
-                CornerRadius = new CornerRadius(4),
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment = VerticalAlignment.Center
+                CornerRadius = new CornerRadius(6)
             };
             closeBtn.Click += (s, e) => this.Close();
 
-            Grid.SetColumn(logoStack, 0);
-            Grid.SetColumn(closeBtn, 1);
-            
-            headerGrid.Children.Add(logoStack);
-            headerGrid.Children.Add(closeBtn);
+            Grid.SetColumn(iconFrame, 0);
+            Grid.SetColumn(title, 1);
+            Grid.SetColumn(closeBtn, 2);
+            header.Children.Add(iconFrame);
+            header.Children.Add(title);
+            header.Children.Add(closeBtn);
 
-            // --- CPU, RAM, and GPU Live Progress Gauges ---
-            var metricsStack = new StackPanel { Spacing = 10 };
-
-            // CPU Gauge
-            var cpuStack = new StackPanel { Spacing = 3 };
-            var cpuHeader = new Grid();
-            var cpuLabel = new TextBlock { Text = "CPU Usage", FontFamily = new FontFamily("Segoe UI"), FontSize = 12, Foreground = textMain };
-            _cpuText = new TextBlock { Text = "0%", FontFamily = new FontFamily("Consolas"), FontSize = 12, FontWeight = Microsoft.UI.Text.FontWeights.Bold, Foreground = accentMain, HorizontalAlignment = HorizontalAlignment.Right };
-            cpuHeader.Children.Add(cpuLabel);
-            cpuHeader.Children.Add(_cpuText);
-
-            _cpuProgress = new ProgressBar
+            var metricsShell = new Border
             {
-                Value = 0,
-                Minimum = 0,
-                Maximum = 100,
-                Height = 4,
-                CornerRadius = new CornerRadius(2),
-                Foreground = accentMain,
-                Background = new SolidColorBrush(Color.FromArgb(25, 255, 255, 255))
+                BorderBrush = new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(8),
+                Background = new SolidColorBrush(Color.FromArgb(32, 255, 255, 255)),
+                Padding = new Thickness(10)
             };
-            cpuStack.Children.Add(cpuHeader);
-            cpuStack.Children.Add(_cpuProgress);
-
-            // Memory Gauge
-            var ramStack = new StackPanel { Spacing = 3 };
-            var ramHeader = new Grid();
-            var ramLabel = new TextBlock { Text = "Memory Usage", FontFamily = new FontFamily("Segoe UI"), FontSize = 12, Foreground = textMain };
-            _ramText = new TextBlock { Text = "0%", FontFamily = new FontFamily("Consolas"), FontSize = 12, FontWeight = Microsoft.UI.Text.FontWeights.Bold, Foreground = accentWarning, HorizontalAlignment = HorizontalAlignment.Right };
-            ramHeader.Children.Add(ramLabel);
-            ramHeader.Children.Add(_ramText);
-
-            _ramProgress = new ProgressBar
+            var metricsGrid = new Grid();
+            metricsShell.Child = metricsGrid;
+            for (var i = 0; i < 4; i++)
             {
-                Value = 0,
-                Minimum = 0,
-                Maximum = 100,
-                Height = 4,
-                CornerRadius = new CornerRadius(2),
-                Foreground = accentWarning,
-                Background = new SolidColorBrush(Color.FromArgb(25, 255, 255, 255))
-            };
-            ramStack.Children.Add(ramHeader);
-            ramStack.Children.Add(_ramProgress);
+                metricsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            }
 
-            // GPU Gauge
-            var accentInfo = new SolidColorBrush(Color.FromArgb(255, 59, 159, 255)); // Bright blue
-            var gpuStack = new StackPanel { Spacing = 3 };
-            var gpuHeader = new Grid();
-            var gpuLabel = new TextBlock { Text = "GPU Usage", FontFamily = new FontFamily("Segoe UI"), FontSize = 12, Foreground = textMain };
-            _gpuText = new TextBlock { Text = "0%", FontFamily = new FontFamily("Consolas"), FontSize = 12, FontWeight = Microsoft.UI.Text.FontWeights.Bold, Foreground = accentInfo, HorizontalAlignment = HorizontalAlignment.Right };
-            gpuHeader.Children.Add(gpuLabel);
-            gpuHeader.Children.Add(_gpuText);
+            _cpuText = new TextBlock();
+            _cpuProgress = new ProgressBar();
+            var cpuCard = CreateMetricColumn("\uE950", "CPU", _cpuText, _cpuProgress, accentMain, "Load monitor", "Core sample");
 
-            _gpuProgress = new ProgressBar
+            _ramText = new TextBlock();
+            _ramProgress = new ProgressBar();
+            var ramCard = CreateMetricColumn("\uE8B7", "RAM", _ramText, _ramProgress, accentWarning, "Memory use", "Sweep ready");
+
+            _gpuText = new TextBlock();
+            _gpuProgress = new ProgressBar();
+            var gpuCard = CreateMetricColumn("\uE7F4", "GPU", _gpuText, _gpuProgress, accentInfo, "Engine load", "VRAM view");
+
+            var netValue = new TextBlock
             {
-                Value = 0,
-                Minimum = 0,
-                Maximum = 100,
-                Height = 4,
-                CornerRadius = new CornerRadius(2),
-                Foreground = accentInfo,
-                Background = new SolidColorBrush(Color.FromArgb(25, 255, 255, 255))
+                Text = "Live",
+                FontFamily = new FontFamily("Consolas"),
+                FontSize = 19,
+                FontWeight = Microsoft.UI.Text.FontWeights.Bold,
+                Foreground = textMain
             };
-            gpuStack.Children.Add(gpuHeader);
-            gpuStack.Children.Add(_gpuProgress);
+            var netProgress = new ProgressBar { Value = 42, Minimum = 0, Maximum = 100, Height = 6, CornerRadius = new CornerRadius(3), Foreground = accentMain, Background = new SolidColorBrush(Color.FromArgb(36, 255, 255, 255)) };
+            var netCard = CreateMetricColumn("\uE839", "NET", netValue, netProgress, accentMain, "DNS tools", "Tray actions");
 
-            metricsStack.Children.Add(cpuStack);
-            metricsStack.Children.Add(ramStack);
-            metricsStack.Children.Add(gpuStack);
+            Grid.SetColumn(cpuCard, 0);
+            Grid.SetColumn(ramCard, 1);
+            Grid.SetColumn(gpuCard, 2);
+            Grid.SetColumn(netCard, 3);
+            metricsGrid.Children.Add(cpuCard);
+            metricsGrid.Children.Add(ramCard);
+            metricsGrid.Children.Add(gpuCard);
+            metricsGrid.Children.Add(netCard);
 
-            // --- PC Uptime & Glowing Status Row ---
-            var detailsGrid = new Grid();
+            var infoGrid = new Grid { ColumnSpacing = 10 };
+            infoGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            infoGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
             _uptimeText = new TextBlock
             {
                 Text = "Uptime: 00m",
-                FontFamily = new FontFamily("Consolas"),
-                FontSize = 10,
-                Foreground = textDim,
-                VerticalAlignment = VerticalAlignment.Center
+                FontSize = 18,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                Foreground = textMain
             };
-            
-            var statusStack = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 5, HorizontalAlignment = HorizontalAlignment.Right };
-            
-            var statusDot = new Border
+            var bootText = new TextBlock
             {
-                Width = 6,
-                Height = 6,
-                CornerRadius = new CornerRadius(3),
-                Background = accentMain,
-                VerticalAlignment = VerticalAlignment.Center
+                Text = $"Last Boot: {DateTime.Now.Subtract(SystemService.GetUptime()):MMM d, HH:mm}",
+                FontSize = 12,
+                Foreground = textDim
             };
-            
+            var uptimeStack = new StackPanel { Spacing = 2 };
+            uptimeStack.Children.Add(_uptimeText);
+            uptimeStack.Children.Add(bootText);
+
+            var alert = new Border
+            {
+                Background = new SolidColorBrush(Color.FromArgb(76, 255, 255, 255)),
+                BorderBrush = new SolidColorBrush(Color.FromArgb(60, 255, 255, 255)),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(8),
+                Padding = new Thickness(10, 8, 10, 8),
+                HorizontalAlignment = HorizontalAlignment.Stretch
+            };
+            var alertGrid = new Grid { ColumnSpacing = 12 };
+            alertGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            alertGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            var alertStack = new StackPanel();
             _statusText = new TextBlock
             {
-                Text = "Optimized",
-                FontFamily = new FontFamily("Segoe UI"),
-                FontSize = 10,
+                Text = "System Ready",
+                FontSize = 13,
                 FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
-                Foreground = accentMain,
-                VerticalAlignment = VerticalAlignment.Center
+                Foreground = textMain
             };
-            statusStack.Children.Add(statusDot);
-            statusStack.Children.Add(_statusText);
+            alertStack.Children.Add(_statusText);
+            alertStack.Children.Add(new TextBlock { Text = "Live monitor active", FontSize = 11, Foreground = textDim });
+            var analyzeBtn = CreatePlainButton("Processes", textMain, new SolidColorBrush(Color.FromArgb(50, 255, 255, 255)));
+            analyzeBtn.Click += OpenDashboard_Click;
+            Grid.SetColumn(alertStack, 0);
+            Grid.SetColumn(analyzeBtn, 1);
+            alertGrid.Children.Add(alertStack);
+            alertGrid.Children.Add(analyzeBtn);
+            alert.Child = alertGrid;
 
-            detailsGrid.Children.Add(_uptimeText);
-            detailsGrid.Children.Add(statusStack);
+            Grid.SetColumn(uptimeStack, 0);
+            Grid.SetColumn(alert, 1);
+            infoGrid.Children.Add(uptimeStack);
+            infoGrid.Children.Add(alert);
 
-            // --- Action Buttons (Quick Boost & Dashboard) ---
-            var buttonsGrid = new Grid();
-            buttonsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(5.5, GridUnitType.Star) });
-            buttonsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(4.5, GridUnitType.Star) });
-            buttonsGrid.ColumnSpacing = 8;
+            var actions = new Grid { ColumnSpacing = 10, RowSpacing = 10 };
+            actions.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            actions.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            actions.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            actions.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-            _boostBtn = new Button
-            {
-                Content = "Quick Boost",
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                FontSize = 11,
-                FontWeight = Microsoft.UI.Text.FontWeights.Bold,
-                Height = 30,
-                Padding = new Thickness(0, 4, 0, 4),
-                Background = new SolidColorBrush(Color.FromArgb(30, 74, 234, 220)),
-                Foreground = accentMain,
-                CornerRadius = new CornerRadius(15),
-                BorderThickness = new Thickness(1),
-                BorderBrush = new SolidColorBrush(Color.FromArgb(70, 74, 234, 220))
-            };
+            _boostBtn = CreateActionTile("\uE945", "Boost", "Memory sweep", accentMain, new SolidColorBrush(Color.FromArgb(96, 28, 205, 140)));
             _boostBtn.Click += Boost_Click;
-
-            var openBtn = new Button
-            {
-                Content = "Dashboard",
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                FontSize = 11,
-                Height = 30,
-                Padding = new Thickness(0, 4, 0, 4),
-                Background = new SolidColorBrush(Color.FromArgb(20, 255, 255, 255)),
-                Foreground = textMain,
-                CornerRadius = new CornerRadius(15),
-                BorderThickness = new Thickness(0)
-            };
-            openBtn.Click += OpenDashboard_Click;
+            _gameModeBtn = CreateActionTile("\uE7FC", "Game", GameBoosterService.IsActive ? "Focus active" : "Focus ready", accentInfo, new SolidColorBrush(Color.FromArgb(74, 45, 96, 210)));
+            _gameModeBtn.Click += GameMode_Click;
+            _dnsBtn = CreateActionTile("\uE839", "DNS", "Flush cache", accentWarning, new SolidColorBrush(Color.FromArgb(78, 172, 111, 45)));
+            _dnsBtn.Click += DnsFlush_Click;
+            _transparentBtn = CreateActionTile("\uE8A1", "Overlay", "Transparent", textMain, new SolidColorBrush(Color.FromArgb(54, 255, 255, 255)));
+            _transparentBtn.Click += Transparent_Click;
 
             Grid.SetColumn(_boostBtn, 0);
-            Grid.SetColumn(openBtn, 1);
-            buttonsGrid.Children.Add(_boostBtn);
-            buttonsGrid.Children.Add(openBtn);
+            Grid.SetColumn(_gameModeBtn, 1);
+            Grid.SetRow(_dnsBtn, 1);
+            Grid.SetColumn(_dnsBtn, 0);
+            Grid.SetRow(_transparentBtn, 1);
+            Grid.SetColumn(_transparentBtn, 1);
+            actions.Children.Add(_boostBtn);
+            actions.Children.Add(_gameModeBtn);
+            actions.Children.Add(_dnsBtn);
+            actions.Children.Add(_transparentBtn);
 
-            mainStack.Children.Add(headerGrid);
-            mainStack.Children.Add(metricsStack);
-            mainStack.Children.Add(detailsGrid);
-            mainStack.Children.Add(buttonsGrid);
+            var dashboardButton = CreatePlainButton("Dashboard", textMain, new SolidColorBrush(Color.FromArgb(88, 255, 255, 255)));
+            dashboardButton.Height = 46;
+            dashboardButton.FontSize = 18;
+            dashboardButton.Click += OpenDashboard_Click;
 
-            border.Child = mainStack;
-            grid.Children.Add(border);
+            var quickModes = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+            quickModes.Children.Add(new TextBlock { Text = "Mode", FontSize = 12, Foreground = textDim, VerticalAlignment = VerticalAlignment.Center });
+            quickModes.Children.Add(CreateModePill("Eco Mode", false));
+            quickModes.Children.Add(CreateModePill("Balanced Mode", false));
+            quickModes.Children.Add(CreateModePill(GameBoosterService.IsActive ? "Game Focus On" : "Game Focus Off", GameBoosterService.IsActive));
 
-            this.Content = grid;
+            main.Children.Add(header);
+            main.Children.Add(metricsShell);
+            main.Children.Add(infoGrid);
+            main.Children.Add(actions);
+            main.Children.Add(dashboardButton);
+            main.Children.Add(quickModes);
+
+            border.Child = main;
+            root.Children.Add(border);
+            this.Content = root;
+        }
+
+        private static Border CreateMetricColumn(string glyph, string label, TextBlock valueText, ProgressBar progress, Brush accent, string line1, string line2)
+        {
+            valueText.Text = "0%";
+            valueText.FontFamily = new FontFamily("Consolas");
+            valueText.FontSize = 20;
+            valueText.FontWeight = Microsoft.UI.Text.FontWeights.Bold;
+            valueText.Foreground = new SolidColorBrush(Color.FromArgb(255, 244, 244, 245));
+
+            progress.Minimum = 0;
+            progress.Maximum = 100;
+            progress.Height = 5;
+            progress.CornerRadius = new CornerRadius(3);
+            progress.Foreground = accent;
+            progress.Background = new SolidColorBrush(Color.FromArgb(36, 255, 255, 255));
+
+            var stack = new StackPanel { Spacing = 5, Margin = new Thickness(0, 0, 10, 0) };
+            var header = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
+            header.Children.Add(new FontIcon { Glyph = glyph, FontSize = 18, Foreground = accent });
+            header.Children.Add(valueText);
+            stack.Children.Add(header);
+            stack.Children.Add(progress);
+            stack.Children.Add(new TextBlock { Text = label, FontSize = 10, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Foreground = accent });
+            stack.Children.Add(new TextBlock { Text = line1, FontSize = 11, Foreground = new SolidColorBrush(Color.FromArgb(220, 244, 244, 245)) });
+            stack.Children.Add(new TextBlock { Text = line2, FontSize = 10, Foreground = new SolidColorBrush(Color.FromArgb(190, 161, 161, 170)) });
+
+            return new Border
+            {
+                BorderBrush = new SolidColorBrush(Color.FromArgb(34, 255, 255, 255)),
+                BorderThickness = new Thickness(0, 0, 1, 0),
+                Child = stack
+            };
+        }
+
+        private static Button CreateActionTile(string glyph, string title, string subtitle, Brush foreground, Brush background)
+        {
+            return new Button
+            {
+                Content = CreateActionContent(glyph, title, subtitle, foreground),
+                Height = 60,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                HorizontalContentAlignment = HorizontalAlignment.Stretch,
+                Padding = new Thickness(12, 8, 12, 8),
+                Background = background,
+                BorderBrush = new SolidColorBrush(Color.FromArgb(55, 255, 255, 255)),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(8)
+            };
+        }
+
+        private static Grid CreateActionContent(string glyph, string title, string subtitle, Brush foreground)
+        {
+            var grid = new Grid { ColumnSpacing = 10 };
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            grid.Children.Add(new FontIcon { Glyph = glyph, FontSize = 24, Foreground = foreground, VerticalAlignment = VerticalAlignment.Center });
+            var text = new StackPanel();
+            text.Children.Add(new TextBlock { Text = title, FontSize = 18, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Foreground = foreground });
+            text.Children.Add(new TextBlock { Text = subtitle, FontSize = 11, Foreground = new SolidColorBrush(Color.FromArgb(220, 244, 244, 245)) });
+            Grid.SetColumn(text, 1);
+            grid.Children.Add(text);
+            return grid;
+        }
+
+        private static Button CreatePlainButton(string text, Brush foreground, Brush background)
+        {
+            return new Button
+            {
+                Content = text,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                HorizontalContentAlignment = HorizontalAlignment.Center,
+                FontSize = 12,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                Foreground = foreground,
+                Background = background,
+                BorderBrush = new SolidColorBrush(Color.FromArgb(58, 255, 255, 255)),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(8),
+                Padding = new Thickness(12, 7, 12, 7)
+            };
+        }
+
+        private static Border CreateModePill(string text, bool active)
+        {
+            return new Border
+            {
+                Background = new SolidColorBrush(active ? Color.FromArgb(86, 242, 198, 109) : Color.FromArgb(42, 255, 255, 255)),
+                BorderBrush = new SolidColorBrush(active ? Color.FromArgb(120, 242, 198, 109) : Color.FromArgb(50, 255, 255, 255)),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(7),
+                Padding = new Thickness(9, 5, 9, 5),
+                Child = new TextBlock
+                {
+                    Text = text,
+                    FontSize = 11,
+                    Foreground = new SolidColorBrush(Color.FromArgb(230, 244, 244, 245))
+                }
+            };
         }
 
         private void Border_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
@@ -471,8 +561,8 @@ namespace TAY.Views
                 // That avoids creating empty white title bar placeholders in borderless windows!
                 this.ExtendsContentIntoTitleBar = false;
 
-                int width = 295;
-                int height = 275;
+                int width = 680;
+                int height = 418;
                 appWindow.Resize(new Windows.Graphics.SizeInt32(width, height));
 
                 // Position beautifully above the bottom-right system tray working area using native Win32 calls
@@ -543,7 +633,7 @@ namespace TAY.Views
             if (_boostBtn == null) return;
 
             _boostBtn.IsEnabled = false;
-            _boostBtn.Content = "Boosting...";
+            _boostBtn.Content = CreateActionContent("\uE945", "Boosting", "Memory sweep", new SolidColorBrush(Color.FromArgb(255, 88, 213, 201)));
 
             System.Threading.Tasks.Task.Run(() =>
             {
@@ -555,11 +645,11 @@ namespace TAY.Views
                     UpdateStats();
                     if (clearedMB > 10)
                     {
-                        _boostBtn.Content = $"Cleared {clearedMB:F0} MB";
+                        _boostBtn.Content = CreateActionContent("\uE945", "Boost", $"Cleared {clearedMB:F0} MB", new SolidColorBrush(Color.FromArgb(255, 88, 213, 201)));
                     }
                     else
                     {
-                        _boostBtn.Content = "System Peak";
+                        _boostBtn.Content = CreateActionContent("\uE945", "Boost", "Already lean", new SolidColorBrush(Color.FromArgb(255, 88, 213, 201)));
                     }
 
                     // Reset after 3 seconds
@@ -572,7 +662,7 @@ namespace TAY.Views
                         resetTimer.Stop();
                         if (_boostBtn != null)
                         {
-                            _boostBtn.Content = "Quick Boost";
+                            _boostBtn.Content = CreateActionContent("\uE945", "Boost", "Memory sweep", new SolidColorBrush(Color.FromArgb(255, 88, 213, 201)));
                             _boostBtn.IsEnabled = true;
                         }
                     };
@@ -608,6 +698,84 @@ namespace TAY.Views
             }
             catch { }
             return bytesCleared;
+        }
+
+        private async void GameMode_Click(object sender, RoutedEventArgs e)
+        {
+            if (_gameModeBtn == null) return;
+
+            _gameModeBtn.IsEnabled = false;
+            _gameModeBtn.Content = CreateActionContent("\uE7FC", "Game", GameBoosterService.IsActive ? "Stopping focus" : "Starting focus", new SolidColorBrush(Color.FromArgb(255, 122, 167, 255)));
+
+            try
+            {
+                if (GameBoosterService.IsActive)
+                {
+                    await Task.Run(GameBoosterService.DeactivateGameMode);
+                }
+                else
+                {
+                    await GameBoosterService.ActivateGameModeAsync();
+                }
+            }
+            finally
+            {
+                _gameModeBtn.Content = CreateActionContent("\uE7FC", "Game", GameBoosterService.IsActive ? "Focus active" : "Focus ready", new SolidColorBrush(Color.FromArgb(255, 122, 167, 255)));
+                _gameModeBtn.IsEnabled = true;
+            }
+        }
+
+        private async void DnsFlush_Click(object sender, RoutedEventArgs e)
+        {
+            if (_dnsBtn == null) return;
+
+            _dnsBtn.IsEnabled = false;
+            _dnsBtn.Content = CreateActionContent("\uE839", "DNS", "Flushing cache", new SolidColorBrush(Color.FromArgb(255, 242, 198, 109)));
+
+            try
+            {
+                var ok = await NetworkService.FlushDnsAsync();
+                _dnsBtn.Content = CreateActionContent("\uE839", "DNS", ok ? "Cache cleared" : "Flush failed", new SolidColorBrush(Color.FromArgb(255, 242, 198, 109)));
+            }
+            catch
+            {
+                _dnsBtn.Content = CreateActionContent("\uE839", "DNS", "Flush failed", new SolidColorBrush(Color.FromArgb(255, 242, 198, 109)));
+            }
+
+            var resetTimer = new Microsoft.UI.Xaml.DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(2)
+            };
+            resetTimer.Tick += (s, ev) =>
+            {
+                resetTimer.Stop();
+                if (_dnsBtn != null)
+                {
+                    _dnsBtn.Content = CreateActionContent("\uE839", "DNS", "Flush cache", new SolidColorBrush(Color.FromArgb(255, 242, 198, 109)));
+                    _dnsBtn.IsEnabled = true;
+                }
+            };
+            resetTimer.Start();
+        }
+
+        private void Transparent_Click(object sender, RoutedEventArgs e)
+        {
+            _isTransparentMode = !_isTransparentMode;
+
+            if (_rootBorder != null)
+            {
+                _rootBorder.Background = _isTransparentMode
+                    ? _transparentFlyoutBackground
+                    : _solidFlyoutBackground;
+                _rootBorder.BorderBrush = new SolidColorBrush(_isTransparentMode
+                    ? Color.FromArgb(72, 255, 255, 255)
+                    : Color.FromArgb(58, 255, 255, 255));
+            }
+
+            if (_transparentBtn != null)
+            {
+                _transparentBtn.Content = CreateActionContent("\uE8A1", _isTransparentMode ? "Solid" : "Overlay", _isTransparentMode ? "Restore panel" : "Transparent", new SolidColorBrush(Color.FromArgb(255, 244, 244, 245)));
+            }
         }
 
         private void OpenDashboard_Click(object sender, RoutedEventArgs e)

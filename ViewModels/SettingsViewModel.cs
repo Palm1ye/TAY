@@ -354,16 +354,21 @@ namespace TAY.ViewModels
                     return;
                 }
 
-                await using var input = await response.Content.ReadAsStreamAsync();
-                await using var output = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.None);
-                await input.CopyToAsync(output);
+                await using (var input = await response.Content.ReadAsStreamAsync())
+                await using (var output = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.Read))
+                {
+                    await input.CopyToAsync(output);
+                    await output.FlushAsync();
+                }
 
                 UpdateStatus = "launching installer...";
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = targetPath,
+                    WorkingDirectory = Path.GetTempPath(),
                     UseShellExecute = true
                 });
+                UpdateStatus = "installer launched";
             }
             catch (HttpRequestException ex)
             {

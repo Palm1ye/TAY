@@ -16,13 +16,25 @@ namespace TAY.Services
 
         private static readonly string[] OptimizeServices = { "wuauserv", "SysMain", "WerSvc" };
         public static readonly string[] MonitorGames = {
-            "cs2", "dota2", "RocketLeague", "GTA5", "Cyberpunk2077", 
-            "VALORANT-Win64-Shipping", "FortniteClient-Win64-Shipping", 
-            "League of Legends", "Overwatch"
+            "cs2", "dota2", "RocketLeague", "GTA5", "Cyberpunk2077",
+            "VALORANT-Win64-Shipping", "FortniteClient-Win64-Shipping",
+            "League of Legends", "Overwatch", "Overwatch Launcher",
+            "r5apex", "cod", "ModernWarfare", "Warzone", "BlackOpsColdWar",
+            "RainbowSix", "RainbowSix_BE", "TslGame", "EscapeFromTarkov",
+            "FactoryGame", "Minecraft.Windows", "javaw", "RobloxPlayerBeta",
+            "eldenring", "armoredcore6", "sekiro", "DarkSoulsIII",
+            "RDR2", "ForzaHorizon5", "ForzaHorizon4", "HogwartsLegacy",
+            "Starfield", "TheFinals", "Discovery", "DeadByDaylight-Win64-Shipping",
+            "Palworld-Win64-Shipping", "Helldivers2", "Warframe.x64",
+            "PathOfExileSteam", "PathOfExile_x64Steam", "Diablo IV",
+            "Wow", "ffxiv_dx11", "GenshinImpact", "ZenlessZoneZero",
+            "eFootball", "FC24", "FC25", "nba2k25"
         };
 
         private static List<string> _pausedServices = new();
+        private static HashSet<int> _trackedGameProcessIds = new();
         private static HashSet<int> _boostedProcessIds = new();
+        private static HashSet<int> _priorityBlockedProcessIds = new();
         private static Timer? _monitorTimer;
         private static bool _isGameModeActive = false;
         private static readonly object _lock = new();
@@ -67,7 +79,9 @@ namespace TAY.Services
                     }
 
                     // 3. Start process priority monitoring
+                    _trackedGameProcessIds.Clear();
                     _boostedProcessIds.Clear();
+                    _priorityBlockedProcessIds.Clear();
                     _monitorTimer = new Timer(MonitorTick, null, 1000, 3000);
 
                     RealTimeLogService.Instance.Log("[SUCCESS] Game Mode activated. Non-essential services paused.");
@@ -142,7 +156,7 @@ namespace TAY.Services
 
                 lock (_lock)
                 {
-                    foreach (var pid in _boostedProcessIds)
+                    foreach (var pid in _trackedGameProcessIds)
                     {
                         if (!activeIds.Contains(pid))
                         {
@@ -163,7 +177,9 @@ namespace TAY.Services
                     // Boost new game processes
                     foreach (var proc in currentGames)
                     {
-                        if (!_boostedProcessIds.Contains(proc.Id))
+                        _trackedGameProcessIds.Add(proc.Id);
+
+                        if (!_boostedProcessIds.Contains(proc.Id) && !_priorityBlockedProcessIds.Contains(proc.Id))
                         {
                             try
                             {
@@ -171,9 +187,11 @@ namespace TAY.Services
                                 _boostedProcessIds.Add(proc.Id);
                                 RealTimeLogService.Instance.Log($"[BOOST] Elevated {proc.ProcessName} (PID: {proc.Id}) to HIGH PRIORITY.");
                             }
-                            catch (Exception ex)
+                            catch
                             {
-                                RealTimeLogService.Instance.Log($"Failed to elevate priority for {proc.ProcessName}: {ex.Message}");
+                                _priorityBlockedProcessIds.Add(proc.Id);
+                                RealTimeLogService.Instance.Log(
+                                    $"Priority boost skipped for {proc.ProcessName} (PID: {proc.Id}). Windows or anti-cheat denied access; Game Mode will continue without changing this process priority.");
                             }
                         }
                     }
@@ -199,6 +217,8 @@ namespace TAY.Services
                     }
                     catch { }
                 }
+                _trackedGameProcessIds.Clear();
+                _priorityBlockedProcessIds.Clear();
                 _boostedProcessIds.Clear();
             }
         }

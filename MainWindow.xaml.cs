@@ -6,12 +6,15 @@ using Windows.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Runtime.InteropServices;
 using TAY.Services;
 
 namespace TAY
 {
     public sealed partial class MainWindow : Window
     {
+        public bool AllowClose { get; set; }
+
         private readonly Dictionary<string, Type> _routes = new()
         {
             ["Optimize"] = typeof(Views.DashboardView),
@@ -24,6 +27,9 @@ namespace TAY
             ["Settings"] = typeof(Views.SettingsView)
         };
         private bool _isSidebarCompact;
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
         public ObservableCollection<string> LogLines => RealTimeLogService.Instance.LogLines;
 
@@ -53,6 +59,7 @@ namespace TAY
 
                 appWindow.Resize(new SizeInt32(1220, 760));
                 appWindow.SetIcon("Assets\\tay.ico");
+                appWindow.Closing += AppWindow_Closing;
 
                 this.ExtendsContentIntoTitleBar = true;
                 this.SetTitleBar(AppTitleBar);
@@ -104,6 +111,16 @@ namespace TAY
             {
                 // Window customization is best-effort on older Windows builds.
             }
+        }
+
+        private void AppWindow_Closing(AppWindow sender, AppWindowClosingEventArgs args)
+        {
+            if (AllowClose) return;
+
+            args.Cancel = true;
+            var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            ShowWindow(hWnd, 0);
+            RealTimeLogService.Instance.Log("TAY is still running in the system tray. Use tray menu > Exit to close it.");
         }
 
         private void Navigate(string route)
