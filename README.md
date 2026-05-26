@@ -31,6 +31,7 @@ The dashboard is a bento-style command center for live system status.
 * **Telemetry history:** LiveCharts2/SkiaSharp chart for recent CPU, RAM, and GPU activity.
 * **Power plan control:** Reads and switches available Windows power plans through `powercfg`.
 * **Quick Boost:** Trims process working sets and performs a managed memory sweep for quick memory recovery.
+* **Compact card layout:** Temperature details are kept fully visible without clipping.
 * **Hardware summary:** Shows CPU, GPU, RAM, motherboard, process count, disk status, and uptime.
 
 ### Boost Tuning
@@ -59,10 +60,6 @@ Disk Analyzer helps identify storage pressure and locate large files.
 Startup Manager helps review and control programs that launch with Windows.
 
 * **Registry inspection:** Reads startup entries from standard Windows Run registry locations.
-* **Status toggles:** Enables or disables supported startup items.
-* **Sorting controls:** Sort by recommended order, app name, impact, enabled-first, or disabled-first.
-* **Guidance text:** Explains which view is useful and warns users to disable only entries they recognize.
-
 ### Cleaner
 
 Cleaner identifies temporary and cache-heavy locations.
@@ -80,6 +77,14 @@ Hardware view collects detailed local system information.
 * **Graphics:** GPU name, dedicated VRAM, shared memory, and total graphics memory.
 * **Memory:** Installed RAM capacity and memory architecture.
 * **System:** Motherboard, operating system, build information, and platform details.
+
+### Network
+
+Network view monitors active adapters and bandwidth.
+
+* **Adapter overview:** Current adapter, IP, MAC, and link speed at a glance.
+* **Live throughput:** Download and upload meters update every second.
+* **Quick speed test:** In-app Cloudflare test for down, up, and latency.
 
 ### Process Manager
 

@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <TayVersion>0.3.1</TayVersion>
+    <TayVersion>0.4.0</TayVersion>
     <Version>$(TayVersion)</Version>
     <AssemblyVersion>$(TayVersion)</AssemblyVersion>
     <FileVersion>$(TayVersion)</FileVersion>

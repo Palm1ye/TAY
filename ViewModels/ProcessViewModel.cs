@@ -129,8 +129,11 @@ namespace TAY.ViewModels
         private readonly ProcessViewModel _parent;
         public int Id { get; }
         public string Name { get; }
+        public double CpuValue { get; }
+        public string CpuStr => $"{CpuValue:0.0}%";
         public string RamStr { get; }
         public long RamBytes { get; }
+        public double RamPercent => Math.Clamp(RamBytes / (1024.0 * 1024 * 1024 * 4) * 100.0, 0, 100);
         public bool IsProtected { get; }
         public bool CanEndTask => !IsProtected;
         public string ProtectionLabel => IsProtected ? "protected" : "user task";
@@ -140,6 +143,7 @@ namespace TAY.ViewModels
             _parent = parent;
             Id = p.Id;
             Name = p.Name;
+            CpuValue = p.Cpu;
             RamBytes = p.Ram;
             RamStr = SystemService.FormatBytes(p.Ram);
             IsProtected = IsProtectedProcess(Name, Id);

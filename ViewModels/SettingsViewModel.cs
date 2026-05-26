@@ -9,6 +9,7 @@ using System.Security.Principal;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Microsoft.Win32;
 using TAY.Services;
 
 namespace TAY.ViewModels
@@ -39,10 +40,72 @@ namespace TAY.ViewModels
         public string ElevationStatus => IsRunningAsAdministrator() ? "Administrator session active" : "Standard user session";
         public string ArchitectureInfo => $"{RuntimeInformationLabel}, {Environment.ProcessorCount} logical processors";
 
+        public event Action<bool>? PinWindowOnTopChanged;
+
+        [ObservableProperty]
+        private bool pinWindowOnTop;
+
+        [ObservableProperty]
+        private bool launchAtSignIn = IsLaunchAtSignInEnabled();
+
+        [ObservableProperty]
+        private bool backgroundScanning = true;
+
+        [ObservableProperty]
+        private bool sendAnonymousDiagnostics;
+
         private SettingsViewModel()
         {
             RefreshSystemSummary();
             RefreshMaintenanceState();
+        }
+
+        partial void OnPinWindowOnTopChanged(bool value)
+        {
+            PinWindowOnTopChanged?.Invoke(value);
+            MaintenanceStatus = value ? "Window pinned above other apps." : "Window pin disabled.";
+        }
+
+        partial void OnLaunchAtSignInChanged(bool value)
+        {
+            try
+            {
+                using var runKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
+                if (runKey == null)
+                {
+                    MaintenanceStatus = "Launch at sign-in could not be changed.";
+                    return;
+                }
+
+                if (value)
+                {
+                    var exePath = Process.GetCurrentProcess().MainModule?.FileName ?? "";
+                    if (!string.IsNullOrWhiteSpace(exePath))
+                    {
+                        runKey.SetValue("TAY Optimizer", $"\"{exePath}\"", RegistryValueKind.String);
+                    }
+                }
+                else
+                {
+                    runKey.DeleteValue("TAY Optimizer", false);
+                }
+
+                MaintenanceStatus = value ? "TAY will launch at sign-in." : "Launch at sign-in disabled.";
+            }
+            catch (Exception ex)
+            {
+                MaintenanceStatus = $"Launch at sign-in update failed: {ex.Message}";
+            }
+        }
+
+        partial void OnBackgroundScanningChanged(bool value)
+        {
+            MaintenanceStatus = value ? "Background scanning enabled." : "Background scanning paused.";
+        }
+
+        partial void OnSendAnonymousDiagnosticsChanged(bool value)
+        {
+            MaintenanceStatus = value ? "Anonymous diagnostics enabled." : "Anonymous diagnostics disabled.";
         }
 
         public void BeginAutoCheck()
@@ -423,6 +486,19 @@ namespace TAY.ViewModels
                 using var identity = WindowsIdentity.GetCurrent();
                 var principal = new WindowsPrincipal(identity);
                 return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool IsLaunchAtSignInEnabled()
+        {
+            try
+            {
+                using var runKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run");
+                return runKey?.GetValue("TAY Optimizer") != null;
             }
             catch
             {

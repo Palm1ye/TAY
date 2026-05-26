@@ -7,107 +7,97 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     mc:Ignorable="d"
     Background="Transparent">
-    
+
     <Page.Transitions>
         <TransitionCollection>
-            <EntranceThemeTransition/>
+            <EntranceThemeTransition />
         </TransitionCollection>
     </Page.Transitions>
 
-    <Grid Margin="24,16,24,24">
+    <Grid Margin="14,14,14,12">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        
-        <!-- Page Header -->
-        <StackPanel Margin="3,0,3,12">
-            <TextBlock Text="Temporary files and cache" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
-            <TextBlock Text="Cleaner" FontFamily="Segoe UI" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,1,0,0"/>
-        </StackPanel>
-        
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="1.2*"/>
-            </Grid.ColumnDefinitions>
 
-            <!-- Directories ListView (Sleek terminal rows) -->
-            <ListView ItemsSource="{x:Bind ViewModel.Folders}" SelectionMode="None" Margin="0,0,10,0">
-                <ListView.Header>
-                    <Grid Margin="16,0,16,10">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Text="Cleaner" FontSize="21" FontWeight="SemiBold" />
+                <TextBlock Text="Reclaim disk space safely" FontSize="11" Foreground="{StaticResource TextMuted}" />
+            </StackPanel>
+            <Button Grid.Column="1" Style="{StaticResource GhostButton}" Command="{x:Bind ViewModel.ScanCommand}" IsEnabled="{x:Bind ViewModel.IsNotBusy, Mode=OneWay}" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="7">
+                    <FontIcon Glyph="&#xE72C;" FontSize="13" />
+                    <TextBlock Text="Rescan" />
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <Border Grid.Row="1" Style="{StaticResource SweetCard}" Margin="0,20,0,12" Padding="14">
+            <Grid ColumnSpacing="14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="68" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border Width="58" Height="58" CornerRadius="29" BorderBrush="{StaticResource AccentMain}" BorderThickness="6" VerticalAlignment="Center">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="-1">
+                        <TextBlock Text="{x:Bind ViewModel.TotalSize, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                        <TextBlock Text="selected" FontSize="9" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+                <StackPanel Grid.Column="1" Spacing="10">
+                    <StackPanel Spacing="2">
+                        <TextBlock Text="Ready to clean" FontSize="15" FontWeight="SemiBold" />
+                        <TextBlock Text="{x:Bind ViewModel.SelectedCount, Mode=OneWay}" FontSize="12" Foreground="{StaticResource TextDim}" />
+                    </StackPanel>
+                    <Grid ColumnSpacing="8">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="84" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Cleanup targets" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}" Grid.Column="1" Margin="16,0,0,0"/>
-                        <TextBlock Text="Size" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}" Grid.Column="2" HorizontalAlignment="Right"/>
+                        <Button Content="{x:Bind ViewModel.CleanButtonText, Mode=OneWay}" Style="{StaticResource SweetButton}" Click="CleanSelected_Click" IsEnabled="{x:Bind ViewModel.IsNotBusy, Mode=OneWay}" HorizontalAlignment="Stretch" />
+                        <Button Grid.Column="1" Content="Preview" Style="{StaticResource OutlineButton}" Click="Preview_Click" />
                     </Grid>
-                </ListView.Header>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2">
+            <ListView ItemsSource="{x:Bind ViewModel.Folders}"
+                      SelectionMode="None"
+                      Padding="0,0,0,10"
+                      ItemContainerStyle="{StaticResource FlatListViewItemStyle}">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="viewmodels:FolderItemVM">
-                        <Border Background="{StaticResource RowBg}" CornerRadius="4" Padding="12,7" Margin="3,0,3,4" BorderThickness="1" BorderBrush="{StaticResource RowBorder}">
-                            <Grid>
+                        <Border Background="{StaticResource RowBg}" BorderBrush="{StaticResource RowBorder}" BorderThickness="0,0,0,1" Padding="14,11">
+                            <Grid ColumnSpacing="12">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="30" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                
-                                <CheckBox IsChecked="{x:Bind IsSelected, Mode=TwoWay}" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0" MinWidth="0"/>
-                                
-                                <StackPanel VerticalAlignment="Center" Grid.Column="1">
-                                    <TextBlock Text="{x:Bind Name}" FontFamily="Consolas" FontSize="12" FontWeight="Bold" Foreground="{StaticResource TextMain}"/>
-                                    <TextBlock Text="{x:Bind Path}" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis" Margin="0,3,0,0"/>
+                                <CheckBox IsChecked="{x:Bind IsSelected, Mode=TwoWay}" MinWidth="0" VerticalAlignment="Center" />
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock Text="{x:Bind Name}" FontSize="14" />
+                                    <TextBlock Text="{x:Bind Path}" FontSize="11" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis" />
                                 </StackPanel>
-                                
-                                <TextBlock Text="{x:Bind SizeStr}" FontFamily="Consolas" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AccentMain}" VerticalAlignment="Center" Grid.Column="2" HorizontalAlignment="Right"/>
+                                <TextBlock Grid.Column="2" Text="{x:Bind SizeStr}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
                             </Grid>
                         </Border>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
 
-            <!-- Summary panel -->
-            <Border Style="{StaticResource SweetCard}" Grid.Column="1" VerticalAlignment="Top">
-                <StackPanel>
-                    <TextBlock Text="Cleanup Summary" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                    
-                    <Grid Margin="0,16,0,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="{x:Bind ViewModel.TotalSize, Mode=OneWay}" FontFamily="Consolas" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextMain}" Grid.Column="0" VerticalAlignment="Center"/>
-                        <ProgressRing IsActive="{x:Bind ViewModel.IsScanning, Mode=OneWay}" Width="20" Height="20" Foreground="{StaticResource AccentMain}" Grid.Column="1" VerticalAlignment="Center"/>
-                    </Grid>
-
-                    <StackPanel Margin="0,0,0,18" Spacing="4">
-                        <TextBlock Text="{x:Bind ViewModel.SelectedSize, Mode=OneWay}" FontFamily="Consolas" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AccentMain}"/>
-                        <TextBlock Text="{x:Bind ViewModel.SelectedCount, Mode=OneWay}" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
-                        <TextBlock Text="{x:Bind ViewModel.CleanupStatus, Mode=OneWay}" FontFamily="Segoe UI" FontSize="11" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap" Margin="0,6,0,0"/>
-                    </StackPanel>
-
-                    <Grid Margin="0,0,0,12">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Button Content="Select All" Style="{StaticResource OutlineButton}" Click="SelectAll_Click" Grid.Column="0" Margin="0,0,8,0"/>
-                        <Button Content="Clear All" Style="{StaticResource OutlineButton}" Click="ClearAll_Click" Grid.Column="1" Margin="8,0,0,0"/>
-                    </Grid>
-
-                    <StackPanel Margin="0,0,0,12" Visibility="{x:Bind ViewModel.IsCleaning, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <TextBlock Text="cleanup_in_progress" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource AccentDanger}"/>
-                        <ProgressBar IsIndeterminate="True" Height="2" Foreground="{StaticResource AccentDanger}" Background="#20F47C7C"/>
-                    </StackPanel>
-
-                    <!-- Primary Action Button -->
-                    <Button Content="{x:Bind ViewModel.ScanButtonText, Mode=OneWay}" Command="{x:Bind ViewModel.ScanCommand}" IsEnabled="{x:Bind ViewModel.IsNotBusy, Mode=OneWay}" Style="{StaticResource SweetButton}" HorizontalAlignment="Stretch" Margin="0,0,0,12"/>
-                    
-                    <!-- Outlined/Soft Destructive Reclaim Button -->
-                    <Button Content="{x:Bind ViewModel.CleanButtonText, Mode=OneWay}" Click="CleanSelected_Click" IsEnabled="{x:Bind ViewModel.IsNotBusy, Mode=OneWay}" Style="{StaticResource DestructiveOutlineButton}" HorizontalAlignment="Stretch"/>
+            <Border Background="#D8202020"
+                    Visibility="{x:Bind ViewModel.IsCleaning, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                    <ProgressRing IsActive="{x:Bind ViewModel.IsCleaning, Mode=OneWay}" Width="34" Height="34" Foreground="{StaticResource AccentMain}" />
+                    <TextBlock Text="{x:Bind ViewModel.CleanupStatus, Mode=OneWay}" FontSize="12" Foreground="{StaticResource TextDim}" TextWrapping="Wrap" MaxWidth="330" TextAlignment="Center" />
                 </StackPanel>
             </Border>
         </Grid>

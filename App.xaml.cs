@@ -3,14 +3,12 @@ using System;
 using System.Runtime.InteropServices;
 using TAY.Services;
 using TAY.ViewModels;
-using TAY.Views;
 
 namespace TAY
 {
     public partial class App : Application
     {
         private Window? m_window;
-        private TrayFlyoutWindow? _flyoutWindow;
         private static System.Threading.Mutex? _appMutex;
 
         [DllImport("user32.dll")]
@@ -48,26 +46,12 @@ namespace TAY
                 TrayIconHelper.Initialize(
                     hWnd,
                     "TAY System Optimizer",
-                    () => ShowTrayFlyout(),
+                    () => ShowMainWindow(),
                     () => ShowMainWindow(),
                     () => ExitApplication()
                 );
             }
             catch { }
-        }
-
-        private void ShowTrayFlyout()
-        {
-            if (_flyoutWindow != null)
-            {
-                try { _flyoutWindow.Close(); } catch { }
-                _flyoutWindow = null;
-                return;
-            }
-
-            _flyoutWindow = new TrayFlyoutWindow();
-            _flyoutWindow.Closed += (s, e) => { _flyoutWindow = null; };
-            _flyoutWindow.Activate();
         }
 
         public void ShowMainWindow()
@@ -83,7 +67,6 @@ namespace TAY
 
         public void ExitApplication()
         {
-            try { _flyoutWindow?.Close(); } catch { }
             try { TrayIconHelper.Shutdown(); } catch { }
             try
             {

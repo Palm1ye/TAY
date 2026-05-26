@@ -188,7 +188,6 @@ namespace TAY.Services
             if (hMenu == IntPtr.Zero) return;
 
             AppendMenuW(hMenu, MF_STRING, (IntPtr)1001, "Open Dashboard");
-            AppendMenuW(hMenu, MF_STRING, (IntPtr)1002, "Toggle Mini Status");
             AppendMenuW(hMenu, MF_SEPARATOR, IntPtr.Zero, "");
             AppendMenuW(hMenu, MF_STRING, (IntPtr)1003, "Exit");
 
@@ -212,10 +211,6 @@ namespace TAY.Services
             if (selectedId == 1001)
             {
                 _onDoubleClick?.Invoke();
-            }
-            else if (selectedId == 1002)
-            {
-                _onLeftClick?.Invoke();
             }
             else if (selectedId == 1003)
             {

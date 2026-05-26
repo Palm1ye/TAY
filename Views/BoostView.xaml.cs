@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using TAY.ViewModels;
@@ -13,6 +14,20 @@ namespace TAY.Views
         {
             this.InitializeComponent();
             this.DataContext = ViewModel;
+            ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+            Unloaded += (_, _) => ViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+        }
+
+        private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName is nameof(BoostViewModel.RamCleanLog) or nameof(BoostViewModel.IsRamPanelVisible) or nameof(BoostViewModel.IsRamCleaning))
+            {
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    BoostScrollViewer.UpdateLayout();
+                    BoostScrollViewer.ChangeView(null, BoostScrollViewer.ScrollableHeight, null, true);
+                });
+            }
         }
 
         private void OnContextMenuToggled(object sender, RoutedEventArgs e)

@@ -1,5 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -129,12 +132,14 @@ namespace TAY.ViewModels
             IsEnabled = app.Enabled;
             Impact = app.Impact.ToUpper();
             ImpactRank = GetImpactRank(app.Impact);
+            ImpactBrush = ResolveImpactBrush(app.Impact);
         }
 
         public string Name { get; }
         public string Command { get; }
         public string Impact { get; }
         public int ImpactRank { get; }
+        public Brush ImpactBrush { get; }
 
         internal static int GetImpactRank(string impact)
         {
@@ -145,6 +150,29 @@ namespace TAY.ViewModels
                 "low" => 1,
                 _ => 0
             };
+        }
+
+        private static Brush ResolveImpactBrush(string impact)
+        {
+            var key = impact?.ToLowerInvariant() switch
+            {
+                "high" => "AccentDanger",
+                "medium" => "AccentWarning",
+                "low" => "AccentGreen",
+                _ => "TextMuted"
+            };
+
+            return TryGetBrush(key) ?? new SolidColorBrush(Colors.Gray);
+        }
+
+        private static Brush? TryGetBrush(string key)
+        {
+            if (Application.Current?.Resources.TryGetValue(key, out var value) == true && value is Brush brush)
+            {
+                return brush;
+            }
+
+            return null;
         }
 
         [ObservableProperty]

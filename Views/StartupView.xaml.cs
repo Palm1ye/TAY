@@ -59,5 +59,31 @@ namespace TAY.Views
                 app.IsEnabled = false;
             }
         }
+
+        private async void DisableHighImpact_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "Disable high-impact startup apps?",
+                Content = "Only enabled entries marked HIGH will be disabled. You can re-enable them from this list.",
+                PrimaryButtonText = "Disable",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Close
+            };
+
+            if (await dialog.ShowAsync() != ContentDialogResult.Primary)
+            {
+                return;
+            }
+
+            foreach (var app in ViewModel.Apps)
+            {
+                if (app.IsEnabled && app.Impact.Equals("HIGH", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    app.IsEnabled = false;
+                }
+            }
+        }
     }
 }

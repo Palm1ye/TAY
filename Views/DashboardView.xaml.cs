@@ -15,11 +15,6 @@ namespace TAY.Views
             this.InitializeComponent();
         }
 
-        private void Page_Unloaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-        {
-            ViewModel.Cleanup();
-        }
-
         private void CopySnapshot_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             var lines = new[]
@@ -38,6 +33,11 @@ namespace TAY.Views
             var data = new DataPackage();
             data.SetText(string.Join(Environment.NewLine, lines));
             Clipboard.SetContent(data);
+        }
+
+        private async void Refresh_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        {
+            await ViewModel.RefreshAsync();
         }
 
         private void OpenBoost_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)

@@ -6,150 +6,200 @@
 
     <Page.Transitions>
         <TransitionCollection>
-            <EntranceThemeTransition/>
+            <EntranceThemeTransition />
         </TransitionCollection>
     </Page.Transitions>
 
-    <Grid Margin="24,16,24,24">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <Grid Margin="3,0,3,12">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0">
-                <TextBlock Text="Device inventory" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
-                <TextBlock Text="Hardware" FontFamily="Segoe UI" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,1,0,0"/>
-            </StackPanel>
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
-                <Button Content="Refresh" Style="{StaticResource SweetButton}" Click="Refresh_Click" Padding="12,6"/>
-                <Button Content="Copy Specs" Style="{StaticResource OutlineButton}" Click="CopySpecs_Click" Padding="12,6"/>
-            </StackPanel>
-        </Grid>
-
-        <Grid Grid.Row="1" ColumnSpacing="8" Margin="0,0,0,8">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1.35*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <Border Style="{StaticResource SweetCard}" Grid.Column="0" Padding="16,14">
-                <Grid ColumnSpacing="14">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Border Width="44" Height="44" CornerRadius="6" Background="#1058D5C9" BorderBrush="#3358D5C9" BorderThickness="1">
-                        <FontIcon Glyph="&#xE950;" FontSize="20" Foreground="{StaticResource AccentMain}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                    <StackPanel Grid.Column="1" Spacing="4">
-                        <TextBlock Text="Processor" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                        <TextBlock Text="{x:Bind ViewModel.CpuName, Mode=OneWay}" FontFamily="Segoe UI" FontSize="13" Foreground="{StaticResource TextMain}" TextTrimming="CharacterEllipsis"/>
-                        <TextBlock Text="{x:Bind ViewModel.CpuClockSpeed, Mode=OneWay}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMuted}"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
-
-            <Border Style="{StaticResource SweetCard}" Grid.Column="1" Padding="16,14">
-                <StackPanel Spacing="4">
-                    <TextBlock Text="Memory" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}"/>
-                    <TextBlock Text="{x:Bind ViewModel.RamCapacity, Mode=OneWay}" FontFamily="Consolas" FontSize="27" FontWeight="Bold" Foreground="{StaticResource AccentWarning}"/>
-                    <TextBlock Text="{x:Bind ViewModel.RamType, Mode=OneWay}" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
-                </StackPanel>
-            </Border>
-
-            <Border Style="{StaticResource SweetCard}" Grid.Column="2" Padding="16,14">
-                <StackPanel Spacing="4">
-                    <TextBlock Text="VRAM" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}"/>
-                    <TextBlock Text="{x:Bind ViewModel.DedicatedVram, Mode=OneWay}" FontFamily="Consolas" FontSize="27" FontWeight="Bold" Foreground="{StaticResource AccentInfo}"/>
-                    <TextBlock Text="{x:Bind ViewModel.GpuName, Mode=OneWay}" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
-                </StackPanel>
-            </Border>
-        </Grid>
-
-        <Border Grid.Row="2" Style="{StaticResource SweetCard}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="14,14,14,12" Spacing="10">
             <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Hardware" FontSize="21" FontWeight="SemiBold" />
+                    <TextBlock Text="Detected devices and current state" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Button Style="{StaticResource GhostButton}" Click="Refresh_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <FontIcon Glyph="&#xE72C;" FontSize="13" />
+                            <TextBlock Text="Rescan" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
 
-                <Grid Margin="0,0,0,10">
+            <Border Background="{StaticResource RowBg}"
+                    BorderBrush="{StaticResource CardBorder}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="13,10">
+                <Grid ColumnSpacing="10">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <StackPanel>
-                        <TextBlock Text="Component details" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                        <TextBlock Text="Expandable inventory grouped by the way Windows reports devices." FontSize="11" Foreground="{StaticResource TextDim}" Margin="0,2,0,0"/>
+                    <FontIcon Glyph="&#xE8FB;" Foreground="{StaticResource AccentMain}" FontSize="16" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Spacing="2">
+                        <TextBlock Text="Driver status available" FontSize="14" FontWeight="SemiBold" />
+                        <TextBlock Text="Display and chipset drivers are checked in Boost Tuning." FontSize="12" Foreground="{StaticResource TextDim}" TextWrapping="Wrap" />
                     </StackPanel>
-                    <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.MotherboardName, Mode=OneWay}" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="360"/>
+                    <Button Grid.Column="2" Content="Open" Style="{StaticResource OutlineButton}" Click="ReviewDrivers_Click" VerticalAlignment="Center" />
                 </Grid>
+            </Border>
 
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Border Style="{StaticResource SweetCard}" Padding="0">
+                <StackPanel>
+                    <Grid Padding="14,11" ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border Width="36" Height="36" CornerRadius="5" Background="#333333" BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                            <FontIcon Glyph="&#xE950;" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                            <TextBlock Text="{x:Bind ViewModel.CpuName, Mode=OneWay}" FontSize="15" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{x:Bind ViewModel.CpuClockSpeed, Mode=OneWay}" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="2" Text="{x:Bind ViewModel.CpuCores, Mode=OneWay}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <Border Grid.Column="3" Background="{StaticResource AccentGreenSoft}" CornerRadius="10" Padding="9,3" VerticalAlignment="Center">
+                            <TextBlock Text="OK" Foreground="{StaticResource AccentGreen}" FontSize="11" />
+                        </Border>
+                    </Grid>
+
+                    <Rectangle Height="1" Fill="{StaticResource RowBorder}" />
+
+                    <Grid Padding="14,11" ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border Width="36" Height="36" CornerRadius="5" Background="#333333" BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                            <FontIcon Glyph="&#xE7F4;" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                            <TextBlock Text="{x:Bind ViewModel.GpuName, Mode=OneWay}" FontSize="15" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{x:Bind ViewModel.DedicatedVram, Mode=OneWay}" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="2" Text="{x:Bind ViewModel.TotalVram, Mode=OneWay}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <Border Grid.Column="3" Background="{StaticResource AccentGreenSoft}" CornerRadius="10" Padding="9,3" VerticalAlignment="Center">
+                            <TextBlock Text="OK" Foreground="{StaticResource AccentGreen}" FontSize="11" />
+                        </Border>
+                    </Grid>
+
+                    <Rectangle Height="1" Fill="{StaticResource RowBorder}" />
+
+                    <Grid Padding="14,11" ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border Width="36" Height="36" CornerRadius="5" Background="#333333" BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                            <FontIcon Glyph="&#xE8B7;" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                            <TextBlock Text="{x:Bind ViewModel.RamCapacity, Mode=OneWay}" FontSize="15" />
+                            <TextBlock Text="{x:Bind ViewModel.RamType, Mode=OneWay}" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="2" Text="System" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <Border Grid.Column="3" Background="{StaticResource AccentGreenSoft}" CornerRadius="10" Padding="9,3" VerticalAlignment="Center">
+                            <TextBlock Text="OK" Foreground="{StaticResource AccentGreen}" FontSize="11" />
+                        </Border>
+                    </Grid>
+
+                    <Rectangle Height="1" Fill="{StaticResource RowBorder}" />
+
+                    <Grid Padding="14,11" ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border Width="36" Height="36" CornerRadius="5" Background="#333333" BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                            <FontIcon Glyph="&#xE964;" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                            <TextBlock Text="{x:Bind ViewModel.MotherboardName, Mode=OneWay}" FontSize="15" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{x:Bind ViewModel.OsName, Mode=OneWay}" FontSize="11" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                        <Border Grid.Column="2" Background="{StaticResource AccentGreenSoft}" CornerRadius="10" Padding="9,3" VerticalAlignment="Center">
+                            <TextBlock Text="OK" Foreground="{StaticResource AccentGreen}" FontSize="11" />
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="HardwareDetailsHost" Style="{StaticResource SweetCard}" Padding="0">
+                <StackPanel>
+                    <Grid Padding="14,10">
+                        <StackPanel>
+                            <TextBlock Text="Component details" FontSize="15" FontWeight="SemiBold" />
+                            <TextBlock Text="Firmware, storage, network, and device-level fields" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                        </StackPanel>
+                    </Grid>
+
                     <ItemsControl ItemsSource="{x:Bind ViewModel.HardwareCategories, Mode=OneWay}">
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Margin="0,0,0,8">
-                            <Expander IsExpanded="True"
-                                      Background="{StaticResource RowBgAlt}"
-                                      BorderBrush="{StaticResource RowBorder}"
-                                      BorderThickness="1"
-                                      CornerRadius="5"
-                                      Padding="0"
-                                      HorizontalAlignment="Stretch">
-                                <Expander.Header>
-                                    <Grid Padding="10,8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Border Width="32" Height="32" CornerRadius="5" Background="#1058D5C9" BorderBrush="#3358D5C9" BorderThickness="1">
-                                            <FontIcon Glyph="{Binding IconGlyph}" FontSize="15" Foreground="{StaticResource AccentMain}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                        </Border>
-                                        <StackPanel Grid.Column="1" Margin="10,0,10,0">
-                                            <TextBlock Text="{Binding Title}" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                                            <TextBlock Text="{Binding Summary}" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
-                                        </StackPanel>
-                                        <TextBlock Grid.Column="2" Text="Details" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="18,0,0,0"/>
-                                    </Grid>
-                                </Expander.Header>
-
-                                <ItemsControl ItemsSource="{Binding Rows}" Padding="68,0,18,10" HorizontalAlignment="Stretch" MinWidth="820">
-                                    <ItemsControl.ItemContainerStyle>
-                                        <Style TargetType="ContentPresenter">
-                                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                                        </Style>
-                                    </ItemsControl.ItemContainerStyle>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border BorderBrush="{StaticResource RowBorder}" BorderThickness="0,1,0,0" Padding="0,7" HorizontalAlignment="Stretch" MinWidth="734">
-                                                <Grid ColumnSpacing="18" HorizontalAlignment="Stretch" MinWidth="734">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="190"/>
-                                                        <ColumnDefinition Width="544"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock Text="{Binding Label}" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
-                                                    <TextBlock Grid.Column="1" Text="{Binding Value}" FontFamily="Consolas" FontSize="10.5" Foreground="{StaticResource TextMain}" TextWrapping="WrapWholeWords"/>
-                                                </Grid>
+                                <Expander IsExpanded="False"
+                                          HorizontalAlignment="Stretch"
+                                          MinWidth="420"
+                                          Background="Transparent"
+                                          BorderBrush="{StaticResource RowBorder}"
+                                          BorderThickness="0,1,0,0">
+                                    <Expander.Header>
+                                        <Grid ColumnSpacing="10" Padding="14,9" HorizontalAlignment="Stretch">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="34" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Width="32" Height="32" CornerRadius="5" Background="#333333" BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                                                <FontIcon Glyph="{Binding IconGlyph}" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                             </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </Expander>
-                                </Border>
+                                            <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="SemiBold" />
+                                                <TextBlock Text="{Binding Summary}" FontSize="11" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Expander.Header>
+
+                                    <ItemsControl ItemsSource="{Binding Rows}" Margin="14,0,14,10">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Padding="0,5" ColumnSpacing="10">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="138" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Label}" FontSize="11" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding Value}" FontSize="11" Foreground="{StaticResource TextDim}" TextWrapping="WrapWholeWords" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Expander>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                </ScrollViewer>
-            </Grid>
-        </Border>
-    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Button Content="Copy detected specs" Style="{StaticResource OutlineButton}" Click="CopySpecs_Click" HorizontalAlignment="Stretch" />
+        </StackPanel>
+    </ScrollViewer>
 </Page>

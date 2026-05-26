@@ -7,261 +7,116 @@
 
     <Page.Transitions>
         <TransitionCollection>
-            <EntranceThemeTransition/>
+            <EntranceThemeTransition />
         </TransitionCollection>
     </Page.Transitions>
 
-    <Grid Margin="24,16,24,24">
+    <Grid Margin="14,14,14,12">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        
-        <!-- Page Header -->
-        <Grid Margin="3,0,3,12">
+
+        <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0">
-                <TextBlock Text="Analyze capacity and find heavy files" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
-                <TextBlock Text="Disk" FontFamily="Segoe UI" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,1,0,0"/>
+            <StackPanel>
+                <TextBlock Text="Disk" FontSize="21" FontWeight="SemiBold" />
+                <TextBlock Text="Volumes, usage, and health" FontSize="11" Foreground="{StaticResource TextMuted}" />
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                <Button Content="Rescan Last" Style="{StaticResource OutlineButton}" Click="RescanLast_Click"/>
-                <Button Content="Copy Report" Style="{StaticResource OutlineButton}" Click="CopyReport_Click"/>
+                <Button Style="{StaticResource GhostButton}" Click="RescanLast_Click">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <FontIcon Glyph="&#xE72C;" FontSize="13" />
+                        <TextBlock Text="Refresh" />
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </Grid>
 
-        <!-- Two Column Zen Layout -->
-        <Grid Grid.Row="1" Margin="-4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1.1*"/> <!-- Drives list and large files list -->
-                <ColumnDefinition Width="0.9*"/> <!-- Proportional Treemap View -->
-            </Grid.ColumnDefinitions>
-
-            <!-- Column 0: Drives and Large Files List -->
-            <Grid Grid.Column="0" Margin="4">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/> <!-- Drive Item Grid -->
-                    <RowDefinition Height="Auto"/> <!-- Status Details -->
-                    <RowDefinition Height="*"/>    <!-- Large Files List -->
-                </Grid.RowDefinitions>
-
-                <!-- Drives Grid -->
-                <GridView ItemsSource="{x:Bind ViewModel.Drives}" SelectionMode="None" Grid.Row="0">
-                    <GridView.ItemTemplate>
+        <ScrollViewer Grid.Row="1" Margin="0,20,0,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Spacing="12">
+                <ItemsControl ItemsSource="{x:Bind ViewModel.Drives}">
+                    <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="viewmodels:DriveItemVM">
-                            <Border Style="{StaticResource SweetCard}" Width="260" Height="148" Margin="0,0,8,8">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                        <FontIcon Glyph="&#xE7F6;" FontSize="17" Foreground="{StaticResource AccentMain}" Margin="0,0,10,0"/>
-                                        <StackPanel VerticalAlignment="Center">
-                                            <TextBlock Text="{x:Bind Label}" FontFamily="Segoe UI" FontSize="13" FontWeight="Bold" Foreground="White"/>
-                                            <TextBlock Text="{x:Bind Letter}" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextDim}"/>
+                            <Border Style="{StaticResource SweetCard}" Margin="0,0,0,12" Padding="14">
+                                <Grid ColumnSpacing="14">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="42" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Width="42" Height="42" CornerRadius="7" Background="#333333" BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                                        <FontIcon Glyph="&#xEDA2;" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel Grid.Column="1" Spacing="8">
+                                        <Grid>
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="{x:Bind Letter}" FontSize="15" FontWeight="SemiBold" />
+                                                <TextBlock Text="{x:Bind Label}" FontSize="15" Foreground="{StaticResource TextDim}" />
+                                                <Border Background="#373737" CornerRadius="10" Padding="9,3">
+                                                    <TextBlock Text="Healthy" Foreground="{StaticResource AccentGreen}" FontSize="11" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="{x:Bind UsedPercentStr}" FontSize="12" Foreground="{StaticResource TextDim}" HorizontalAlignment="Right" />
+                                        </Grid>
+                                        <ProgressBar Value="{x:Bind UsedPercent}" Minimum="0" Maximum="100" Height="5" Foreground="{StaticResource AccentMain}" Background="#3A3A3A" />
+                                        <Grid>
+                                            <TextBlock Text="{x:Bind CapacityStr}" FontSize="12" Foreground="{StaticResource TextDim}" />
+                                            <Button Content="Analyze" Command="{x:Bind AnalyzeCommand}" Style="{StaticResource GhostButton}" Padding="8,3" HorizontalAlignment="Right" />
+                                        </Grid>
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Text="Hotspots:" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                                            <Border Background="#383838" CornerRadius="10" Padding="8,3">
+                                                <TextBlock Text="Windows" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                                            </Border>
+                                            <Border Background="#383838" CornerRadius="10" Padding="8,3">
+                                                <TextBlock Text="Program Files" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                                            </Border>
                                         </StackPanel>
                                     </StackPanel>
-                                    
-                                    <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="0,0,0,10">
-                                        <!-- Minimalist Progress Line -->
-                                        <Border Background="#10FFFFFF" Height="4" CornerRadius="2" HorizontalAlignment="Left" Width="210">
-                                            <Border Background="{StaticResource AccentMain}" Height="4" CornerRadius="2" HorizontalAlignment="Left" Width="{x:Bind UsedWidth}"/>
-                                        </Border>
-                                        <TextBlock Text="{x:Bind CapacityStr}" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextDim}" Margin="0,6,0,0"/>
-                                    </StackPanel>
-                                    
-                                    <Button Content="Analyze Storage" Command="{x:Bind AnalyzeCommand}" Style="{StaticResource SweetButton}" Grid.Row="2" HorizontalAlignment="Stretch" FontSize="11" Height="28" Padding="0,4"/>
                                 </Grid>
                             </Border>
                         </DataTemplate>
-                    </GridView.ItemTemplate>
-                </GridView>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
-                <!-- Status Panel -->
-                <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="4,8,4,8">
-                    <TextBlock Text="Largest Files" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" VerticalAlignment="Center"/>
-                    <ProgressRing IsActive="{x:Bind ViewModel.IsScanning, Mode=OneWay}" Width="14" Height="14" Margin="12,0,0,0" Foreground="{StaticResource AccentMain}"/>
-                    <TextBlock Text="{x:Bind ViewModel.ScanStatus, Mode=OneWay}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextDim}" Margin="12,0,0,0" VerticalAlignment="Center"/>
-                </StackPanel>
-
-                <!-- Sleek Rows for Large Files -->
-                <Grid Grid.Row="2">
-                    <Border Style="{StaticResource SweetCard}" VerticalAlignment="Top" Visibility="{x:Bind ViewModel.HasLargeFiles, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                        <StackPanel Spacing="8">
-                            <TextBlock Text="No scan yet" FontFamily="Segoe UI" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                            <TextBlock Text="Analyze a drive to list the largest files and populate the storage map." FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}" TextWrapping="Wrap"/>
-                        </StackPanel>
-                    </Border>
-
-                <ListView ItemsSource="{x:Bind ViewModel.LargeFiles}" SelectionMode="None" Margin="0,0,0,8" Padding="0,0,0,12" Visibility="{x:Bind ViewModel.HasLargeFiles, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="viewmodels:LargeFileVM">
-                            <Border Background="#06FFFFFF" CornerRadius="5" Padding="10,7" Margin="3,0,3,4" BorderThickness="1" BorderBrush="{StaticResource CardBorder}">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="100"/>
-                                        <ColumnDefinition Width="140"/>
-                                    </Grid.ColumnDefinitions>
-                                    
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="{x:Bind Name}" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" TextTrimming="CharacterEllipsis"/>
-                                        <TextBlock Text="{x:Bind Path}" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
-                                    </StackPanel>
-                                    <TextBlock Text="{x:Bind SizeStr}" FontFamily="Consolas" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AccentMain}" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                        <Button Content="Open" Click="OpenFileLocation_Click" Style="{StaticResource GhostButton}" Padding="8,4" FontSize="11"/>
-                                        <Button Content="Copy Path" Click="CopyFilePath_Click" Style="{StaticResource GhostButton}" Padding="8,4" FontSize="11"/>
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-                </Grid>
-            </Grid>
-
-            <!-- Column 1: Proportional Treemap Storage Visualization -->
-            <Border Style="{StaticResource SweetCard}" Grid.Column="1" Margin="4">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                        <Border Background="#1A7FE3A5" CornerRadius="5" Padding="7" Margin="0,0,10,0">
-                            <FontIcon Glyph="&#xE9F9;" FontSize="18" Foreground="{StaticResource AccentMain}"/>
-                        </Border>
-                        <TextBlock Text="Visual Storage Map" FontFamily="Segoe UI" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextMain}" VerticalAlignment="Center"/>
+                <Border Style="{StaticResource SweetCard}" Visibility="{x:Bind ViewModel.IsScanning, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <StackPanel Spacing="8">
+                        <ProgressBar IsIndeterminate="True" Height="3" Foreground="{StaticResource AccentMain}" />
+                        <TextBlock Text="{x:Bind ViewModel.ScanStatus, Mode=OneWay}" FontSize="12" Foreground="{StaticResource TextDim}" TextWrapping="Wrap" />
                     </StackPanel>
+                </Border>
 
-                    <StackPanel Grid.Row="1" Margin="0,0,0,16" Spacing="4">
-                        <TextBlock Text="{x:Bind ViewModel.MapStatus, Mode=OneWay}" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
-                        <TextBlock Text="{x:Bind ViewModel.ScannedTotalSize, Mode=OneWay}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource AccentMain}"/>
+                <Border Style="{StaticResource SweetCard}" Padding="0" Visibility="{x:Bind ViewModel.HasLargeFiles, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <StackPanel>
+                        <Grid Padding="14,10">
+                            <TextBlock Text="Largest files" FontSize="13" FontWeight="SemiBold" />
+                            <Button Content="Copy report" Style="{StaticResource GhostButton}" Click="CopyReport_Click" HorizontalAlignment="Right" Padding="8,3" />
+                        </Grid>
+                        <ItemsControl ItemsSource="{x:Bind ViewModel.LargeFiles}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="viewmodels:LargeFileVM">
+                                    <Border BorderBrush="{StaticResource RowBorder}" BorderThickness="0,1,0,0" Padding="14,8">
+                                        <Grid ColumnSpacing="10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="{x:Bind Name}" FontSize="13" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Text="{x:Bind Path}" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis" />
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="{x:Bind SizeStr}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
-
-                    <!-- Storage category gauges -->
-                    <Grid Grid.Row="2" Margin="0,4,0,4">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-
-                        <!-- Segment 1: System Files (Uniform Card, Cyan Accent) -->
-                        <Border Grid.Row="0" Grid.Column="0" Background="#0C4AEADC" BorderBrush="#224AEADC" BorderThickness="1" CornerRadius="6" Margin="4" Padding="16">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <StackPanel Grid.Row="0" VerticalAlignment="Top">
-                                    <TextBlock Text="SYSTEM" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#4AEADC"/>
-                                    <TextBlock Text="Windows &amp; Drivers" FontFamily="Segoe UI" FontSize="10" Foreground="{StaticResource TextDim}" Margin="0,2,0,0"/>
-                                </StackPanel>
-                                <StackPanel Grid.Row="1">
-                                    <Grid Margin="0,0,0,8">
-                                        <TextBlock Text="{x:Bind ViewModel.SystemPercentStr, Mode=OneWay}" FontFamily="Consolas" FontSize="11" Foreground="#4AEADC" HorizontalAlignment="Left"/>
-                                        <TextBlock Text="{x:Bind ViewModel.SystemFilesSize, Mode=OneWay}" FontFamily="Consolas" FontSize="12" FontWeight="Bold" Foreground="White" HorizontalAlignment="Right"/>
-                                    </Grid>
-                                    <ProgressBar Value="{x:Bind ViewModel.SystemPercent, Mode=OneWay}" Minimum="0" Maximum="100" Height="4" CornerRadius="2" Foreground="#4AEADC" Background="#10FFFFFF"/>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-
-                        <!-- Segment 2: Applications & Games (Uniform Card, Sunset Gold) -->
-                        <Border Grid.Row="0" Grid.Column="1" Background="#0CFFD580" BorderBrush="#22FFD580" BorderThickness="1" CornerRadius="6" Margin="4" Padding="16">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <StackPanel Grid.Row="0" VerticalAlignment="Top">
-                                    <TextBlock Text="APPLICATIONS" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#FFD580"/>
-                                    <TextBlock Text="Games &amp; Software" FontFamily="Segoe UI" FontSize="10" Foreground="{StaticResource TextDim}" Margin="0,2,0,0"/>
-                                </StackPanel>
-                                <StackPanel Grid.Row="1">
-                                    <Grid Margin="0,0,0,8">
-                                        <TextBlock Text="{x:Bind ViewModel.AppsPercentStr, Mode=OneWay}" FontFamily="Consolas" FontSize="11" Foreground="#FFD580" HorizontalAlignment="Left"/>
-                                        <TextBlock Text="{x:Bind ViewModel.ApplicationsSize, Mode=OneWay}" FontFamily="Consolas" FontSize="12" FontWeight="Bold" Foreground="White" HorizontalAlignment="Right"/>
-                                    </Grid>
-                                    <ProgressBar Value="{x:Bind ViewModel.AppsPercent, Mode=OneWay}" Minimum="0" Maximum="100" Height="4" CornerRadius="2" Foreground="#FFD580" Background="#10FFFFFF"/>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-
-                        <!-- Segment 3: User Media & Downloads (Uniform Card, Slate Blue) -->
-                        <Border Grid.Row="1" Grid.Column="0" Background="#0C89A5FF" BorderBrush="#2289A5FF" BorderThickness="1" CornerRadius="6" Margin="4" Padding="16">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <StackPanel Grid.Row="0" VerticalAlignment="Top">
-                                    <TextBlock Text="USER MEDIA" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#89A5FF"/>
-                                    <TextBlock Text="Videos &amp; Photos" FontFamily="Segoe UI" FontSize="10" Foreground="{StaticResource TextDim}" Margin="0,2,0,0"/>
-                                </StackPanel>
-                                <StackPanel Grid.Row="1">
-                                    <Grid Margin="0,0,0,8">
-                                        <TextBlock Text="{x:Bind ViewModel.MediaPercentStr, Mode=OneWay}" FontFamily="Consolas" FontSize="11" Foreground="#89A5FF" HorizontalAlignment="Left"/>
-                                        <TextBlock Text="{x:Bind ViewModel.UserMediaSize, Mode=OneWay}" FontFamily="Consolas" FontSize="12" FontWeight="Bold" Foreground="White" HorizontalAlignment="Right"/>
-                                    </Grid>
-                                    <ProgressBar Value="{x:Bind ViewModel.MediaPercent, Mode=OneWay}" Minimum="0" Maximum="100" Height="4" CornerRadius="2" Foreground="#89A5FF" Background="#10FFFFFF"/>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-
-                        <!-- Segment 4: Temp Cache Files (Uniform Card, Soft Coral Red) -->
-                        <Border Grid.Row="1" Grid.Column="1" Background="#0CFF8A8A" BorderBrush="#22FF8A8A" BorderThickness="1" CornerRadius="6" Margin="4" Padding="16">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <StackPanel Grid.Row="0" VerticalAlignment="Top">
-                                    <TextBlock Text="CACHE &amp; TEMP" FontFamily="Segoe UI" FontSize="11" FontWeight="Bold" Foreground="#FF8A8A"/>
-                                    <TextBlock Text="Prefetch &amp; Recycler" FontFamily="Segoe UI" FontSize="10" Foreground="{StaticResource TextDim}" Margin="0,2,0,0"/>
-                                </StackPanel>
-                                <StackPanel Grid.Row="1">
-                                    <Grid Margin="0,0,0,8">
-                                        <TextBlock Text="{x:Bind ViewModel.CachePercentStr, Mode=OneWay}" FontFamily="Consolas" FontSize="11" Foreground="#FF8A8A" HorizontalAlignment="Left"/>
-                                        <TextBlock Text="{x:Bind ViewModel.CacheTempSize, Mode=OneWay}" FontFamily="Consolas" FontSize="12" FontWeight="Bold" Foreground="White" HorizontalAlignment="Right"/>
-                                    </Grid>
-                                    <ProgressBar Value="{x:Bind ViewModel.CachePercent, Mode=OneWay}" Minimum="0" Maximum="100" Height="4" CornerRadius="2" Foreground="#FF8A8A" Background="#10FFFFFF"/>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-
-                        <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Background="#08FFFFFF" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="6" Margin="4" Padding="14,10">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <TextBlock Text="Other scanned files" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                                    <TextBlock Text="Documents, unknown extensions, and files outside core categories" FontFamily="Segoe UI" FontSize="11" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap"/>
-                                </StackPanel>
-                                <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.OtherPercentStr, Mode=OneWay}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextDim}" VerticalAlignment="Center" Margin="12,0"/>
-                                <TextBlock Grid.Column="2" Text="{x:Bind ViewModel.OtherFilesSize, Mode=OneWay}" FontFamily="Consolas" FontSize="12" FontWeight="Bold" Foreground="{StaticResource TextMain}" VerticalAlignment="Center"/>
-                            </Grid>
-                        </Border>
-                    </Grid>
-                </Grid>
-            </Border>
-        </Grid>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

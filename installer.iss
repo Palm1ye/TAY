@@ -1,8 +1,8 @@
 ﻿; TAY System Optimizer - Inno Setup Script
-; Version: 0.3.1
+; Version: 0.4.0
 
 #define MyAppName "TAY System Optimizer"
-#define MyAppVersion "0.3.1"
+#define MyAppVersion "0.4.0"
 #define MyAppPublisher "Palm1ye"
 #define MyAppURL "https://github.com/Palm1ye/TAY"
 #define MyAppExeName "TAY.exe"
@@ -45,5 +45,5 @@ Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\Assets\tay.ico"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent shellexec
 

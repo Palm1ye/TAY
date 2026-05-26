@@ -9,400 +9,189 @@
 
     <Page.Transitions>
         <TransitionCollection>
-            <EntranceThemeTransition/>
+            <EntranceThemeTransition />
         </TransitionCollection>
     </Page.Transitions>
 
-    <Grid Margin="24,16,24,24">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <ScrollViewer x:Name="BoostScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="14,14,14,12" Spacing="10">
+            <Grid>
+                <StackPanel>
+                    <TextBlock Text="Boost Tuning" FontSize="21" FontWeight="SemiBold" />
+                    <TextBlock Text="Game, memory, DNS, privacy, and shell tuning" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                </StackPanel>
+            </Grid>
 
-        <Grid Margin="3,0,3,12">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0">
-                <TextBlock Text="Performance, privacy, network, and shell tuning" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
-                <TextBlock Text="Boost Tuning" FontFamily="Segoe UI" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,1,0,0"/>
-            </StackPanel>
-            <Border Grid.Column="1" Style="{StaticResource SweetCard}" Padding="12,10" Width="430">
-                <TextBlock Text="{Binding BoostGuidance}" FontSize="12" Foreground="{StaticResource TextDim}" TextWrapping="Wrap"/>
-            </Border>
-        </Grid>
-
-        <Grid Grid.Row="1" ColumnSpacing="8">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1.05*"/>
-                <ColumnDefinition Width="1.05*"/>
-                <ColumnDefinition Width="0.9*"/>
-            </Grid.ColumnDefinitions>
-
-            <Grid Grid.Column="0" RowSpacing="8">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <Border Style="{StaticResource SweetCard}">
-                    <StackPanel Spacing="12">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <Border Width="42" Height="42" CornerRadius="6" Background="#1058D5C9" BorderBrush="#3358D5C9" BorderThickness="1">
-                                <FontIcon Glyph="&#xE8A7;" FontSize="19" Foreground="{StaticResource AccentMain}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <StackPanel Grid.Column="1" Margin="12,0,12,0">
-                                <TextBlock Text="Privacy Shield" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                                <TextBlock Text="Telemetry and assistant background policies" FontSize="11" Foreground="{StaticResource TextDim}" TextWrapping="Wrap"/>
-                            </StackPanel>
-                            <ToggleSwitch Grid.Column="2" IsOn="{Binding IsTelemetryDebloated, Mode=TwoWay}" OnContent="" OffContent="" MinWidth="0"/>
-                        </Grid>
-                        <Grid ColumnSpacing="8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Border Background="{StaticResource RowBg}" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="5" Padding="10,8">
-                                <StackPanel>
-                                    <TextBlock Text="Services" FontSize="10" Foreground="{StaticResource TextMuted}"/>
-                                    <TextBlock Text="DiagTrack, WAP Push" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMain}" TextTrimming="CharacterEllipsis"/>
-                                </StackPanel>
-                            </Border>
-                            <Border Grid.Column="1" Background="{StaticResource RowBg}" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="5" Padding="10,8">
-                                <StackPanel>
-                                    <TextBlock Text="Reversible" FontSize="10" Foreground="{StaticResource TextMuted}"/>
-                                    <TextBlock Text="Local backup" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMain}"/>
-                                </StackPanel>
-                            </Border>
-                        </Grid>
+            <Border Style="{StaticResource SweetCard}" Margin="0,10,0,0" Padding="14">
+                <Grid ColumnSpacing="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="52" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Border Width="50" Height="50" CornerRadius="8" Background="{StaticResource AccentMain}">
+                        <FontIcon Glyph="&#xE7FC;" FontSize="24" Foreground="#101010" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="Game Focus Mode" FontSize="15" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding ExpectedGameBoost}" FontSize="12" Foreground="{StaticResource TextDim}" TextWrapping="Wrap" MaxLines="2" />
                     </StackPanel>
-                </Border>
+                    <ToggleSwitch Grid.Column="2" IsOn="{Binding IsGameModeActive, Mode=TwoWay}" OnContent="" OffContent="" MinWidth="0" VerticalAlignment="Center" />
+                </Grid>
+            </Border>
 
-                <Border Style="{StaticResource SweetCard}" Grid.Row="1">
-                    <Grid>
+            <Border Style="{StaticResource SweetCard}" Padding="14">
+                <StackPanel Spacing="12">
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="42" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Width="40" Height="40" CornerRadius="7" Background="#333333" BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                            <FontIcon Glyph="&#xE8B7;" FontSize="17" Foreground="{StaticResource AccentMemory}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" Spacing="2">
+                            <TextBlock Text="Memory Sweep" FontSize="15" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding ExpectedMemoryBoost}" FontSize="12" Foreground="{StaticResource TextDim}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Grid>
+                    <Button Content="Deep clean RAM" Command="{Binding DeepCleanRamCommand}" Style="{StaticResource SweetButton}" HorizontalAlignment="Stretch" />
+                    <Border Background="{StaticResource RowBgAlt}" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="5" Padding="10" Visibility="{Binding IsRamPanelVisible, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
+                        <StackPanel Spacing="8">
+                            <ProgressBar IsIndeterminate="{Binding IsRamCleaning, Mode=OneWay}" Height="3" Foreground="{StaticResource AccentMain}" />
+                            <TextBlock Text="{Binding RamCleanLog, Mode=OneWay}" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextDim}" TextWrapping="Wrap" />
+                            <Button Content="OK" Command="{Binding DismissRamResultCommand}" Style="{StaticResource OutlineButton}" Visibility="{Binding IsRamCleaning, Converter={StaticResource InverseBoolToVisibilityConverter}, Mode=OneWay}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource SweetCard}" Padding="14">
+                <StackPanel Spacing="12">
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="42" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Width="40" Height="40" CornerRadius="7" Background="#333333" BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                            <FontIcon Glyph="&#xE839;" FontSize="17" Foreground="{StaticResource AccentPurple}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" Spacing="2">
+                            <TextBlock Text="Network and DNS" FontSize="15" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding DnsScanResult, Mode=OneWay}" FontSize="12" Foreground="{StaticResource TextDim}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Grid>
+                    <Grid ColumnSpacing="8" RowSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <Border Width="42" Height="42" CornerRadius="6" Background="#14F2C66D" BorderBrush="#36F2C66D" BorderThickness="1">
-                                <TextBlock Text="🚀" FontFamily="Segoe UI Emoji" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <StackPanel Grid.Column="1" Margin="12,0,12,0">
-                                <TextBlock Text="Game Focus Mode" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                                <TextBlock Text="{Binding ExpectedGameBoost}" FontSize="11" Foreground="{StaticResource TextDim}" TextWrapping="Wrap"/>
-                            </StackPanel>
-                            <ToggleSwitch Grid.Column="2" IsOn="{Binding IsGameModeActive, Mode=TwoWay}" OnContent="" OffContent="" MinWidth="0"/>
-                        </Grid>
+                        <Button Content="Flush DNS" Command="{Binding FlushDnsCommand}" Style="{StaticResource OutlineButton}" HorizontalAlignment="Stretch" />
+                        <Button Grid.Column="1" Content="Scan DNS" Command="{Binding FindBestDnsCommand}" Style="{StaticResource SweetButton}" HorizontalAlignment="Stretch" />
+                        <Button Grid.Row="1" Content="Apply DNS" Click="ApplyRecommendedDns_Click" IsEnabled="{Binding CanApplyRecommendedDns, Mode=OneWay}" Style="{StaticResource OutlineButton}" HorizontalAlignment="Stretch" />
+                        <Button Grid.Row="1" Grid.Column="1" Content="Restore DHCP" Command="{Binding RestoreDefaultDnsCommand}" Style="{StaticResource OutlineButton}" HorizontalAlignment="Stretch" />
+                    </Grid>
+                    <TextBlock Text="{Binding RecommendedDnsSummary, Mode=OneWay}" FontSize="11" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap" />
+                    <Border Background="{StaticResource RowBgAlt}" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="5" Padding="10" Visibility="{Binding IsNetworkCleaning, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
+                        <TextBlock Text="{Binding NetworkCleanLog, Mode=OneWay}" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextDim}" TextWrapping="Wrap" MaxLines="7" />
+                    </Border>
+                </StackPanel>
+            </Border>
 
-                        <Grid Grid.Row="1" ColumnSpacing="8" Margin="0,12,0,8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Border Background="{StaticResource RowBg}" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="5" Padding="10,8">
-                                <TextBlock Text="Pauses heavy OS services while active" FontSize="11" Foreground="{StaticResource TextDim}" TextWrapping="Wrap"/>
-                            </Border>
-                            <Border Grid.Column="1" Background="{StaticResource RowBg}" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="5" Padding="10,8">
-                                <TextBlock Text="Restores service state after game exit" FontSize="11" Foreground="{StaticResource TextDim}" TextWrapping="Wrap"/>
-                            </Border>
-                        </Grid>
-
-                        <Border Grid.Row="2" Background="{StaticResource RowBgAlt}" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="5" Padding="10" VerticalAlignment="Stretch">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <Grid Margin="0,0,0,8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Supported games" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                                    <TextBlock Grid.Column="1" Text="priority monitor" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource TextMuted}"/>
-                                </Grid>
-                                <ListView Grid.Row="1" ItemsSource="{Binding SupportedGames}" SelectionMode="None" Background="Transparent" BorderThickness="0" Padding="0" MaxHeight="178" VerticalAlignment="Top" HorizontalAlignment="Stretch">
-                                    <ListView.ItemContainerStyle>
-                                        <Style TargetType="ListViewItem">
-                                            <Setter Property="MinHeight" Value="0"/>
-                                            <Setter Property="Padding" Value="0"/>
-                                            <Setter Property="Margin" Value="0,0,0,5"/>
-                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                        </Style>
-                                    </ListView.ItemContainerStyle>
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Background="#101820" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="4" Padding="8,5" HorizontalAlignment="Stretch">
-                                                <Grid ColumnSpacing="8">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock Text="{Binding Name}" FontSize="10.5" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" TextTrimming="CharacterEllipsis"/>
-                                                    <TextBlock Grid.Column="1" Text="{Binding ProcessName}" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis" MaxWidth="132"/>
-                                                </Grid>
+            <Border Style="{StaticResource SweetCard}" Padding="0">
+                <StackPanel>
+                    <Grid Padding="14,10">
+                        <StackPanel>
+                            <TextBlock Text="Privacy and drivers" FontSize="15" FontWeight="SemiBold" />
+                            <TextBlock Text="Reversible Windows policy and signed driver checks" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                        </StackPanel>
+                    </Grid>
+                    <Rectangle Height="1" Fill="{StaticResource RowBorder}" />
+                    <Grid Padding="14,11" ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Privacy Shield" FontSize="14" />
+                            <TextBlock Text="Telemetry and assistant background policies" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="1" IsOn="{Binding IsTelemetryDebloated, Mode=TwoWay}" OnContent="" OffContent="" MinWidth="0" />
+                    </Grid>
+                    <Rectangle Height="1" Fill="{StaticResource RowBorder}" />
+                    <Grid Padding="14,11" ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{Binding OutdatedDriversCount, Mode=OneWay}" FontSize="23" FontWeight="SemiBold" Foreground="{StaticResource AccentWarning}" />
+                            <TextBlock Text="drivers need review" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="Scan" Command="{Binding RefreshDriversCommand}" Style="{StaticResource OutlineButton}" VerticalAlignment="Center" />
+                    </Grid>
+                    <ItemsControl ItemsSource="{Binding Drivers}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="{StaticResource RowBorder}" BorderThickness="0,1,0,0" Padding="14,9">
+                                    <Grid ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Spacing="2">
+                                            <TextBlock Text="{Binding DeviceName}" FontSize="13" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding Provider}" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding Suggestion}" FontSize="10" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap" MaxLines="2" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Top" Spacing="4" MinWidth="82">
+                                            <Border Background="{StaticResource AccentWarningSoft}" CornerRadius="10" Padding="7,3" Visibility="{Binding IsOutdated, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                <TextBlock Text="{Binding StatusLabel}" FontSize="10" Foreground="{StaticResource AccentWarning}" HorizontalAlignment="Center" />
                                             </Border>
-                                        </DataTemplate>
-                                    </ListView.ItemTemplate>
-                                </ListView>
-                                <TextBlock Grid.Row="2" Text="When one of these processes opens, TAY raises its process priority and restores normal state after exit." FontSize="10.5" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap" VerticalAlignment="Bottom" Margin="0,8,0,0"/>
-                            </Grid>
-                        </Border>
-                    </Grid>
-                </Border>
-            </Grid>
-
-            <Grid Grid.Column="1" RowSpacing="8">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <Border Style="{StaticResource SweetCard}">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Border Width="42" Height="42" CornerRadius="6" Background="#1058D5C9" BorderBrush="#3358D5C9" BorderThickness="1">
-                                <FontIcon Glyph="&#xE9D9;" FontSize="19" Foreground="{StaticResource AccentMain}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <StackPanel Grid.Column="1" Margin="12,0,0,0">
-                                <TextBlock Text="Memory Sweep" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                                <TextBlock Text="{Binding ExpectedMemoryBoost}" FontSize="11" Foreground="{StaticResource TextDim}" TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </Grid>
-                        <Button Grid.Row="1" Content="Deep Clean RAM" Command="{Binding DeepCleanRamCommand}" Style="{StaticResource SweetButton}" HorizontalAlignment="Stretch" Margin="0,12,0,0"/>
-
-                        <Border Background="#EC0B1626" Visibility="{Binding IsRamPanelVisible, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" CornerRadius="6" Padding="14">
-                            <StackPanel Spacing="10">
-                                <ProgressRing IsActive="{Binding IsRamCleaning, Mode=OneWay}" Width="24" Height="24" Foreground="{StaticResource AccentMain}" HorizontalAlignment="Center"/>
-                                <TextBlock Text="Memory sweep result" FontSize="12" Foreground="{StaticResource AccentMain}" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                                <Border BorderBrush="{StaticResource CardBorder}" BorderThickness="1" Background="{StaticResource RowBgAlt}" CornerRadius="5" Padding="10,8" Height="92">
-                                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                        <TextBlock Text="{Binding RamCleanLog, Mode=OneWay}" FontFamily="Consolas" FontSize="9.5" Foreground="#83F6EC" TextWrapping="Wrap"/>
-                                    </ScrollViewer>
+                                            <Border Background="{StaticResource AccentGreenSoft}" CornerRadius="10" Padding="7,3" Visibility="{Binding IsOutdated, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                                <TextBlock Text="{Binding StatusLabel}" FontSize="10" Foreground="{StaticResource AccentGreen}" HorizontalAlignment="Center" />
+                                            </Border>
+                                            <TextBlock Text="{Binding DateLabel}" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center" />
+                                        </StackPanel>
+                                    </Grid>
                                 </Border>
-                                <Button Content="OK" Command="{Binding DismissRamResultCommand}" Style="{StaticResource SweetButton}" HorizontalAlignment="Stretch" Visibility="{Binding IsRamCleaning, Converter={StaticResource InverseBoolToVisibilityConverter}, Mode=OneWay}"/>
-                            </StackPanel>
-                        </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource SweetCard}" Padding="0">
+                <StackPanel>
+                    <Grid Padding="14,10">
+                        <TextBlock Text="Context menu" FontSize="15" FontWeight="SemiBold" />
+                        <Button Content="Refresh" Command="{Binding RefreshContextHandlersCommand}" Style="{StaticResource GhostButton}" Padding="8,3" HorizontalAlignment="Right" />
                     </Grid>
-                </Border>
-
-                <Border Style="{StaticResource SweetCard}" Grid.Row="1">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <TextBlock Text="Network and DNS" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,0,0,4"/>
-                        <TextBlock Grid.Row="1" Text="{Binding ExpectedNetworkBoost}" FontSize="11" Foreground="{StaticResource TextDim}" TextWrapping="Wrap" Margin="0,0,0,10"/>
-
-                        <Grid Grid.Row="2" RowSpacing="8">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <TextBlock Text="{Binding DnsScanResult, Mode=OneWay}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource AccentInfo}" TextWrapping="Wrap"/>
-                            <TextBlock Grid.Row="1" Text="{Binding RecommendedDnsSummary, Mode=OneWay}" FontSize="11" Foreground="{StaticResource TextDim}" TextWrapping="Wrap"/>
-                            <Border Grid.Row="2" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="5" Background="{StaticResource RowBg}" MinHeight="92">
-                                <ListView ItemsSource="{Binding DnsResults}" SelectionMode="None" MaxHeight="110" Background="Transparent" BorderThickness="0" Padding="0">
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid Padding="8,5">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Text="{Binding Name}" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource TextMain}" TextTrimming="CharacterEllipsis"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding LatencyMs}" FontFamily="Consolas" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentMain}"/>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ListView.ItemTemplate>
-                                </ListView>
-                            </Border>
-                        </Grid>
-
-                        <Grid Grid.Row="3" ColumnSpacing="8" RowSpacing="8" Margin="0,10,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Button Content="Flush DNS" Command="{Binding FlushDnsCommand}" Style="{StaticResource OutlineButton}" HorizontalAlignment="Stretch"/>
-                            <Button Grid.Column="1" Content="Scan DNS" Command="{Binding FindBestDnsCommand}" Style="{StaticResource SweetButton}" HorizontalAlignment="Stretch"/>
-                            <Button Grid.Row="1" Content="Reset TCP/IP" Command="{Binding ResetTcpIpCommand}" Style="{StaticResource OutlineButton}" HorizontalAlignment="Stretch"/>
-                            <Button Grid.Row="1" Grid.Column="1" Content="Apply DNS" Click="ApplyRecommendedDns_Click" IsEnabled="{Binding CanApplyRecommendedDns, Mode=OneWay}" Style="{StaticResource OutlineButton}" HorizontalAlignment="Stretch"/>
-                            <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Content="Restore DHCP" Command="{Binding RestoreDefaultDnsCommand}" Style="{StaticResource OutlineButton}" HorizontalAlignment="Stretch"/>
-                        </Grid>
-
-                        <Border Background="#EC0B1626" Visibility="{Binding IsNetworkCleaning, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" CornerRadius="6" Padding="14">
-                            <StackPanel Spacing="10">
-                                <ProgressRing IsActive="True" Width="24" Height="24" Foreground="{StaticResource AccentMain}" HorizontalAlignment="Center"/>
-                                <TextBlock Text="Running network task" FontSize="12" Foreground="{StaticResource AccentMain}" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                                <Border BorderBrush="{StaticResource CardBorder}" BorderThickness="1" Background="{StaticResource RowBgAlt}" CornerRadius="5" Padding="10,8" Height="112">
-                                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                        <TextBlock Text="{Binding NetworkCleanLog, Mode=OneWay}" FontFamily="Consolas" FontSize="9.5" Foreground="#83F6EC" TextWrapping="Wrap"/>
-                                    </ScrollViewer>
+                    <ItemsControl ItemsSource="{Binding ContextHandlers}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="{StaticResource RowBorder}" BorderThickness="0,1,0,0" Padding="14,9">
+                                    <Grid ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Name}" FontSize="13" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding SourceType}" FontSize="10" Foreground="{StaticResource TextMuted}" />
+                                        </StackPanel>
+                                        <ToggleSwitch Grid.Column="1" IsOn="{Binding IsEnabled, Mode=OneWay}" Toggled="OnContextMenuToggled" OnContent="" OffContent="" MinWidth="0" />
+                                    </Grid>
                                 </Border>
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-                </Border>
-            </Grid>
-
-            <Grid Grid.Column="2" RowSpacing="8">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <Border Style="{StaticResource SweetCard}">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <Grid Margin="0,0,0,8">
-                            <TextBlock Text="Context menu" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                            <Button Content="Refresh" Command="{Binding RefreshContextHandlersCommand}" Style="{StaticResource OutlineButton}" Padding="10,4" FontSize="11" HorizontalAlignment="Right"/>
-                        </Grid>
-                        <TextBlock Grid.Row="1" Text="Explorer right-click extensions. Disable only slow, broken, or unused vendor entries; disabled items can be enabled again from here." FontSize="11" Foreground="{StaticResource TextDim}" TextWrapping="Wrap" Margin="0,0,0,8"/>
-                        <Border Grid.Row="2" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="5" Background="{StaticResource RowBg}">
-                            <ListView ItemsSource="{Binding ContextHandlers}" SelectionMode="None" Background="Transparent" BorderThickness="0" Padding="0">
-                                <ListView.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border BorderThickness="0,0,0,1" BorderBrush="{StaticResource RowBorder}" Padding="8,5">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <StackPanel Margin="0,0,10,0">
-                                                    <TextBlock Text="{Binding Name}" FontFamily="Consolas" FontSize="10.5" FontWeight="Bold" Foreground="{StaticResource TextMain}" TextTrimming="CharacterEllipsis"/>
-                                                    <TextBlock Text="{Binding SourceType}" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource AccentInfo}"/>
-                                                    <TextBlock Text="{Binding RegistryPath}" FontFamily="Consolas" FontSize="8.5" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
-                                                </StackPanel>
-                                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                                                    <TextBlock Text="On" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource AccentMain}" Visibility="{Binding IsEnabled, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                                                    <TextBlock Text="Off" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource AccentDanger}" Visibility="{Binding IsEnabled, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
-                                                    <ToggleSwitch IsOn="{Binding IsEnabled, Mode=OneWay}" Toggled="OnContextMenuToggled" MinWidth="0" OnContent="" OffContent=""/>
-                                                </StackPanel>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
-                        </Border>
-
-                        <Border Background="#E50A1220" Visibility="{Binding IsContextScanning, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" CornerRadius="6">
-                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
-                                <ProgressRing IsActive="True" Width="28" Height="28" Foreground="{StaticResource AccentMain}"/>
-                                <TextBlock Text="Scanning shell extensions" FontSize="12" Foreground="{StaticResource AccentMain}" FontWeight="SemiBold"/>
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-                </Border>
-
-                <Border Style="{StaticResource SweetCard}" Grid.Row="1">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <Grid Margin="0,0,0,8">
-                            <TextBlock Text="Driver status" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                            <Button Content="Scan" Command="{Binding RefreshDriversCommand}" Style="{StaticResource OutlineButton}" Padding="10,4" FontSize="11" HorizontalAlignment="Right"/>
-                        </Grid>
-                        <TextBlock Grid.Row="1" Text="{Binding OutdatedDriversCount, Mode=OneWay}" FontFamily="Consolas" FontSize="20" FontWeight="Bold" Foreground="{StaticResource AccentWarning}" Margin="0,0,0,0"/>
-                        <TextBlock Grid.Row="1" Text="drivers need review" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="34,8,0,8"/>
-                        <Border Grid.Row="2" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="5" Background="{StaticResource RowBg}">
-                            <ListView ItemsSource="{Binding Drivers}" SelectionMode="None" Background="Transparent" BorderThickness="0" Padding="0">
-                                <ListView.ItemContainerStyle>
-                                    <Style TargetType="ListViewItem">
-                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                        <Setter Property="MinHeight" Value="0"/>
-                                        <Setter Property="Padding" Value="0"/>
-                                    </Style>
-                                </ListView.ItemContainerStyle>
-                                <ListView.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border BorderThickness="0,0,0,1" BorderBrush="{StaticResource RowBorder}" Padding="10,8" HorizontalAlignment="Stretch">
-                                            <Grid RowSpacing="7">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="Auto"/>
-                                                    <RowDefinition Height="Auto"/>
-                                                </Grid.RowDefinitions>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Text="{Binding DeviceName}" FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" TextWrapping="WrapWholeWords" Margin="0,0,10,0"/>
-                                                <StackPanel Grid.Column="1" Grid.RowSpan="2" VerticalAlignment="Top" MinWidth="82">
-                                                    <Border Background="#18F2C66D" BorderBrush="#34F2C66D" BorderThickness="1" CornerRadius="4" Padding="6,3" Visibility="{Binding IsOutdated, Converter={StaticResource BoolToVisibilityConverter}}">
-                                                        <TextBlock Text="{Binding StatusLabel}" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource AccentWarning}" HorizontalAlignment="Center"/>
-                                                    </Border>
-                                                    <Border Background="#1458D5C9" BorderBrush="#3358D5C9" BorderThickness="1" CornerRadius="4" Padding="6,3" Visibility="{Binding IsOutdated, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                                                        <TextBlock Text="{Binding StatusLabel}" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource AccentMain}" HorizontalAlignment="Center"/>
-                                                    </Border>
-                                                    <TextBlock Text="{Binding DateLabel}" FontFamily="Consolas" FontSize="8.5" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center" Margin="0,4,0,0"/>
-                                                </StackPanel>
-                                                <Grid Grid.Row="1" ColumnSpacing="6" Margin="0,0,10,0">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="*"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <Border Background="#147AA7FF" BorderBrush="#307AA7FF" BorderThickness="1" CornerRadius="4" Padding="6,3">
-                                                        <TextBlock Text="{Binding DeviceClass}" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource AccentInfo}"/>
-                                                    </Border>
-                                                    <TextBlock Grid.Column="1" Text="{Binding Provider}" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource TextMuted}" TextWrapping="WrapWholeWords" VerticalAlignment="Center"/>
-                                                </Grid>
-                                                <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Suggestion}" FontSize="9.5" Foreground="{StaticResource TextDim}" TextWrapping="WrapWholeWords"/>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
-                        </Border>
-
-                        <Border Background="#E50A1220" Visibility="{Binding IsDriverScanning, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}" CornerRadius="6">
-                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
-                                <ProgressRing IsActive="True" Width="28" Height="28" Foreground="{StaticResource AccentMain}"/>
-                                <TextBlock Text="Scanning signed drivers" FontSize="12" Foreground="{StaticResource AccentMain}" FontWeight="SemiBold"/>
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-                </Border>
-            </Grid>
-        </Grid>
-    </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
 </Page>

@@ -65,5 +65,23 @@ namespace TAY.Views
                 ViewModel.CleanCommand.Execute(null);
             }
         }
+
+        private async void Preview_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = ViewModel.Folders.Where(f => f.IsSelected).ToList();
+            var preview = selected.Count == 0
+                ? "No cleanup targets are selected."
+                : string.Join("\n", selected.Select(f => $"{f.Name} - {f.SizeStr}"));
+
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "Cleanup preview",
+                Content = preview,
+                CloseButtonText = "OK"
+            };
+
+            await dialog.ShowAsync();
+        }
     }
 }

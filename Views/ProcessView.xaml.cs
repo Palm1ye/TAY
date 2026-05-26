@@ -27,6 +27,13 @@ namespace TAY.Views
             Clipboard.SetContent(data);
         }
 
+        private void Filter_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.SelectedSort = ViewModel.SelectedSort == "Memory High-Low"
+                ? "Name A-Z"
+                : "Memory High-Low";
+        }
+
         private async void EndTask_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Button button || button.DataContext is not ProcessItemVM process)

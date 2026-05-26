@@ -1,13 +1,16 @@
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Windowing;
-using Windows.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using TAY.Services;
+using TAY.ViewModels;
+using Windows.System;
 
 namespace TAY
 {
@@ -15,38 +18,67 @@ namespace TAY
     {
         public bool AllowClose { get; set; }
 
-        private readonly Dictionary<string, Type> _routes = new()
+        private readonly Dictionary<string, Type> _routes = new(StringComparer.OrdinalIgnoreCase)
         {
-            ["Optimize"] = typeof(Views.DashboardView),
+            ["Dashboard"] = typeof(Views.DashboardView),
             ["Boost"] = typeof(Views.BoostView),
-            ["Clean"] = typeof(Views.CleanerView),
-            ["Startup"] = typeof(Views.StartupView),
-            ["Processes"] = typeof(Views.ProcessView),
-            ["Storage"] = typeof(Views.DiskView),
             ["Hardware"] = typeof(Views.HardwareView),
+            ["Startup"] = typeof(Views.StartupView),
+            ["Cleaner"] = typeof(Views.CleanerView),
+            ["Disk"] = typeof(Views.DiskView),
+            ["Processes"] = typeof(Views.ProcessView),
+            ["Network"] = typeof(Views.NetworkView),
+            ["Activity"] = typeof(Views.ActivityView),
             ["Settings"] = typeof(Views.SettingsView)
         };
-        private bool _isSidebarCompact;
+
+        private readonly DispatcherTimer _statusTimer = new();
+        private bool _isPinned;
 
         [DllImport("user32.dll")]
         private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
+
+        private static readonly IntPtr HWND_TOPMOST = new(-1);
+        private static readonly IntPtr HWND_NOTOPMOST = new(-2);
+        private const uint SWP_NOMOVE = 0x0002;
+        private const uint SWP_NOSIZE = 0x0001;
+        private const uint SWP_NOACTIVATE = 0x0010;
 
         public ObservableCollection<string> LogLines => RealTimeLogService.Instance.LogLines;
 
         public MainWindow()
         {
-            this.InitializeComponent();
-            Title = "TAY System Optimizer";
-            this.SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop();
+            InitializeComponent();
 
+            Title = "TAY Optimizer";
+            SystemBackdrop = new MicaBackdrop();
+
+            RegisterKeyboardShortcuts();
+            RealTimeLogService.Instance.Initialize(DispatcherQueue);
             ConfigureWindow();
-            RootFrame.Navigated += (_, _) => SyncSelectedTabWithCurrentPage();
-            UpdateTabVisuals(TabOptimize);
-            Navigate("Optimize");
+            SettingsViewModel.Instance.PinWindowOnTopChanged += SetPinned;
 
-            // Initialize the central logging dispatcher on the primary thread context
-            RealTimeLogService.Instance.Initialize(this.DispatcherQueue);
-            LogLines.CollectionChanged += LogLines_CollectionChanged;
+            RootFrame.Navigated += (_, _) => SyncSelectedTabWithCurrentPage();
+            Navigate("Dashboard");
+
+            _statusTimer.Interval = TimeSpan.FromSeconds(3);
+            _statusTimer.Tick += (_, _) => UpdateFooterMetrics();
+            _statusTimer.Start();
+            UpdateFooterMetrics();
+        }
+
+        private void RegisterKeyboardShortcuts()
+        {
+            var searchAccelerator = new KeyboardAccelerator
+            {
+                Key = VirtualKey.K,
+                Modifiers = VirtualKeyModifiers.Control
+            };
+            searchAccelerator.Invoked += SearchAccelerator_Invoked;
+            RootGrid.KeyboardAccelerators.Add(searchAccelerator);
         }
 
         private void ConfigureWindow()
@@ -57,51 +89,39 @@ namespace TAY
                 var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
                 var appWindow = AppWindow.GetFromWindowId(windowId);
 
-                appWindow.Resize(new SizeInt32(1220, 760));
+                appWindow.Resize(new Windows.Graphics.SizeInt32(500, 680));
                 appWindow.SetIcon("Assets\\tay.ico");
                 appWindow.Closing += AppWindow_Closing;
 
-                this.ExtendsContentIntoTitleBar = true;
-                this.SetTitleBar(AppTitleBar);
+                ExtendsContentIntoTitleBar = true;
+                SetTitleBar(AppTitleBar);
 
                 if (AppWindowTitleBar.IsCustomizationSupported())
                 {
                     var titleBar = appWindow.TitleBar;
                     titleBar.ExtendsContentIntoTitleBar = true;
 
-                    var bgSidebarColor = Windows.UI.Color.FromArgb(255, 13, 27, 42); // #0D1B2A (BgSidebar)
-                    
-                    titleBar.BackgroundColor = bgSidebarColor;
-                    titleBar.InactiveBackgroundColor = bgSidebarColor;
+                    var shell = Windows.UI.Color.FromArgb(255, 32, 32, 32);
+                    var text = Windows.UI.Color.FromArgb(255, 243, 243, 243);
+                    var dim = Windows.UI.Color.FromArgb(255, 160, 160, 160);
+                    var accent = Windows.UI.Color.FromArgb(255, 73, 199, 247);
 
-                    // Button backgrounds transparent
+                    titleBar.BackgroundColor = shell;
+                    titleBar.InactiveBackgroundColor = shell;
+                    titleBar.ForegroundColor = text;
+                    titleBar.InactiveForegroundColor = dim;
                     titleBar.ButtonBackgroundColor = Windows.UI.Color.FromArgb(0, 0, 0, 0);
                     titleBar.ButtonInactiveBackgroundColor = Windows.UI.Color.FromArgb(0, 0, 0, 0);
-
-                    // Foreground Colors (White / Dim)
-                    var textColor = Windows.UI.Color.FromArgb(255, 232, 237, 243); // #E8EDF3 (TextMain)
-                    var textDimColor = Windows.UI.Color.FromArgb(255, 136, 153, 170); // #8899AA (TextDim)
-                    var tealCyan = Windows.UI.Color.FromArgb(255, 74, 234, 220); // #4AEADC (AccentMain)
-
-                    titleBar.ForegroundColor = textColor;
-                    titleBar.InactiveForegroundColor = textDimColor;
-
-                    titleBar.ButtonForegroundColor = textColor;
-                    titleBar.ButtonInactiveForegroundColor = textDimColor;
-
-                    // Hover States
-                    titleBar.ButtonHoverBackgroundColor = Windows.UI.Color.FromArgb(20, 255, 255, 255);
-                    titleBar.ButtonHoverForegroundColor = tealCyan;
-
-                    // Pressed States
-                    titleBar.ButtonPressedBackgroundColor = Windows.UI.Color.FromArgb(40, 255, 255, 255);
-                    titleBar.ButtonPressedForegroundColor = tealCyan;
+                    titleBar.ButtonForegroundColor = text;
+                    titleBar.ButtonInactiveForegroundColor = dim;
+                    titleBar.ButtonHoverBackgroundColor = Windows.UI.Color.FromArgb(255, 48, 48, 48);
+                    titleBar.ButtonHoverForegroundColor = accent;
+                    titleBar.ButtonPressedBackgroundColor = Windows.UI.Color.FromArgb(255, 58, 58, 58);
+                    titleBar.ButtonPressedForegroundColor = accent;
                 }
 
                 if (appWindow.Presenter is OverlappedPresenter presenter)
                 {
-                    presenter.Minimize();
-                    presenter.Restore();
                     presenter.IsResizable = true;
                     presenter.IsMaximizable = true;
                     presenter.IsMinimizable = true;
@@ -109,7 +129,7 @@ namespace TAY
             }
             catch
             {
-                // Window customization is best-effort on older Windows builds.
+                // Window chrome customization is best-effort across Windows builds.
             }
         }
 
@@ -145,119 +165,155 @@ namespace TAY
             var activeStyle = (Style)RootGrid.Resources["ActiveTabStyle"];
             var inactiveStyle = (Style)RootGrid.Resources["InactiveTabStyle"];
 
-            TabOptimize.Style = inactiveStyle;
-            TabBoost.Style = inactiveStyle;
-            TabClean.Style = inactiveStyle;
-            TabStartup.Style = inactiveStyle;
-            TabProcesses.Style = inactiveStyle;
-            TabStorage.Style = inactiveStyle;
-            TabHardware.Style = inactiveStyle;
-            TabSettings.Style = inactiveStyle;
-
-            activeButton.Style = activeStyle;
-        }
-
-        private void BackButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (RootFrame.CanGoBack)
+            foreach (var button in GetTabButtons())
             {
-                RootFrame.GoBack();
-                SyncSelectedTabWithCurrentPage();
+                button.Style = ReferenceEquals(button, activeButton) ? activeStyle : inactiveStyle;
             }
         }
 
-        private void ToggleSidebarButton_Click(object sender, RoutedEventArgs e)
+        private IEnumerable<Button> GetTabButtons()
         {
-            _isSidebarCompact = !_isSidebarCompact;
-            SidebarColumn.Width = new GridLength(_isSidebarCompact ? 56 : 224);
-            SidebarButtonsPanel.Orientation = _isSidebarCompact ? Orientation.Vertical : Orientation.Horizontal;
-
-            var labelVisibility = _isSidebarCompact ? Visibility.Collapsed : Visibility.Visible;
-            AppTitleText.Visibility = labelVisibility;
-            DashboardLabel.Visibility = labelVisibility;
-            BoostLabel.Visibility = labelVisibility;
-            HardwareLabel.Visibility = labelVisibility;
-            StartupLabel.Visibility = labelVisibility;
-            CleanerLabel.Visibility = labelVisibility;
-            DiskLabel.Visibility = labelVisibility;
-            ProcessesLabel.Visibility = labelVisibility;
-            SettingsLabel.Visibility = labelVisibility;
-
-            // Adjust button padding and centering when compact to prevent clipping
-            var buttonPadding = _isSidebarCompact ? new Thickness(0) : new Thickness(12, 0, 12, 0);
-            var contentAlignment = _isSidebarCompact ? HorizontalAlignment.Center : HorizontalAlignment.Left;
-            double iconSpacing = _isSidebarCompact ? 0 : 12;
-
-            var buttons = new List<Button> { TabOptimize, TabBoost, TabHardware, TabStartup, TabClean, TabStorage, TabProcesses, TabSettings };
-            foreach (var btn in buttons)
-            {
-                btn.Padding = buttonPadding;
-                btn.HorizontalContentAlignment = contentAlignment;
-                if (btn.Content is StackPanel sp)
-                {
-                    sp.Spacing = iconSpacing;
-                }
-            }
-
-            // Dynamically center the App Logo inside the collapsed column
-            AppLogoPanel.Margin = _isSidebarCompact ? new Thickness(18, 0, 0, 0) : new Thickness(14, 0, 0, 0);
-
-            // Handle compact/expanded transitions for Sidebar Terminal
-            if (_isSidebarCompact)
-            {
-                SidebarTerminalExpanded.Visibility = Visibility.Collapsed;
-                SidebarTerminalCollapsed.Visibility = Visibility.Visible;
-                SidebarTerminalPanel.Padding = new Thickness(0);
-                SidebarTerminalPanel.Margin = new Thickness(6, 0, 6, 8);
-                SidebarTerminalPanel.BorderThickness = new Thickness(0);
-                SidebarTerminalPanel.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0));
-            }
-            else
-            {
-                SidebarTerminalExpanded.Visibility = Visibility.Visible;
-                SidebarTerminalCollapsed.Visibility = Visibility.Collapsed;
-                SidebarTerminalPanel.Padding = new Thickness(10, 8, 10, 8);
-                SidebarTerminalPanel.Margin = new Thickness(8, 0, 8, 8);
-                SidebarTerminalPanel.BorderThickness = new Thickness(1);
-                SidebarTerminalPanel.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 7, 15, 26)); // matches #070F1A
-            }
-        }
-
-        private void ToggleSidebarFromTerminal_Click(object sender, RoutedEventArgs e)
-        {
-            if (_isSidebarCompact)
-            {
-                ToggleSidebarButton_Click(sender, e);
-            }
+            yield return TabDashboard;
+            yield return TabBoost;
+            yield return TabHardware;
+            yield return TabStartup;
+            yield return TabCleaner;
+            yield return TabDisk;
+            yield return TabProcesses;
+            yield return TabNetwork;
+            yield return TabActivity;
+            yield return TabSettings;
         }
 
         private void SyncSelectedTabWithCurrentPage()
         {
             var pageType = RootFrame.CurrentSourcePageType;
-            if (pageType == typeof(Views.DashboardView)) UpdateTabVisuals(TabOptimize);
+
+            if (pageType == typeof(Views.DashboardView)) UpdateTabVisuals(TabDashboard);
             else if (pageType == typeof(Views.BoostView)) UpdateTabVisuals(TabBoost);
-            else if (pageType == typeof(Views.CleanerView)) UpdateTabVisuals(TabClean);
-            else if (pageType == typeof(Views.StartupView)) UpdateTabVisuals(TabStartup);
-            else if (pageType == typeof(Views.ProcessView)) UpdateTabVisuals(TabProcesses);
-            else if (pageType == typeof(Views.DiskView)) UpdateTabVisuals(TabStorage);
             else if (pageType == typeof(Views.HardwareView)) UpdateTabVisuals(TabHardware);
+            else if (pageType == typeof(Views.StartupView)) UpdateTabVisuals(TabStartup);
+            else if (pageType == typeof(Views.CleanerView)) UpdateTabVisuals(TabCleaner);
+            else if (pageType == typeof(Views.DiskView)) UpdateTabVisuals(TabDisk);
+            else if (pageType == typeof(Views.ProcessView)) UpdateTabVisuals(TabProcesses);
+            else if (pageType == typeof(Views.NetworkView)) UpdateTabVisuals(TabNetwork);
+            else if (pageType == typeof(Views.ActivityView)) UpdateTabVisuals(TabActivity);
             else if (pageType == typeof(Views.SettingsView)) UpdateTabVisuals(TabSettings);
         }
 
-        private void LogLines_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            this.DispatcherQueue.TryEnqueue(() =>
-            {
-                if (TerminalListView.Items.Count > 0)
-                {
-                    TerminalListView.ScrollIntoView(TerminalListView.Items[TerminalListView.Items.Count - 1]);
-                }
-            });
+            NavigateFromSearch(SearchBox.Text);
         }
 
-        private void ClearTerminal_Click(object sender, RoutedEventArgs e)
+        private void SearchBox_KeyDown(object sender, KeyRoutedEventArgs e)
         {
-            RealTimeLogService.Instance.Clear();
+            if (e.Key == VirtualKey.Enter)
+            {
+                NavigateFromSearch(SearchBox.Text, force: true);
+                e.Handled = true;
+            }
+            else if (e.Key == VirtualKey.Escape)
+            {
+                SearchBox.Text = "";
+                RootFrame.Focus(FocusState.Programmatic);
+                e.Handled = true;
+            }
+        }
+
+        private void SearchAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+        {
+            SearchBox.Focus(FocusState.Programmatic);
+            SearchBox.SelectAll();
+            args.Handled = true;
+        }
+
+        private bool NavigateFromSearch(string text, bool force = false)
+        {
+            var query = text.Trim().ToLowerInvariant();
+            if (!force && query.Length < 2) return false;
+            if (query.Length == 0) return false;
+
+            var route = query switch
+            {
+                var q when Matches(q, "dashboard", "home", "status", "system") => "Dashboard",
+                var q when Matches(q, "boost", "boost tuning", "game", "ram", "memory", "dns") => "Boost",
+                var q when Matches(q, "hardware", "driver", "drivers", "device", "cpu", "gpu") => "Hardware",
+                var q when Matches(q, "startup", "boot", "sign in", "launch") => "Startup",
+                var q when Matches(q, "cleaner", "clean", "cache", "temp", "trash") => "Cleaner",
+                var q when Matches(q, "disk", "storage", "drive", "volume") => "Disk",
+                var q when Matches(q, "processes", "process", "task", "cpu") => "Processes",
+                var q when Matches(q, "network", "wifi", "wi-fi", "adapter", "tailscale", "internet") => "Network",
+                var q when Matches(q, "activity", "log", "logs", "events") => "Activity",
+                var q when Matches(q, "settings", "setting", "ayar", "ayarlar", "update") => "Settings",
+                _ => null
+            };
+
+            if (route != null)
+            {
+                Navigate(route);
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool Matches(string query, params string[] aliases)
+        {
+            foreach (var alias in aliases)
+            {
+                if (alias.StartsWith(query, StringComparison.OrdinalIgnoreCase) ||
+                    query.Contains(alias, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void PinButton_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsViewModel.Instance.PinWindowOnTop = !_isPinned;
+        }
+
+        private void SetPinned(bool value)
+        {
+            if (_isPinned == value)
+            {
+                return;
+            }
+
+            _isPinned = value;
+            var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            SetWindowPos(
+                hWnd,
+                _isPinned ? HWND_TOPMOST : HWND_NOTOPMOST,
+                0,
+                0,
+                0,
+                0,
+                SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+
+            PinButton.Foreground = (Brush)Application.Current.Resources[_isPinned ? "AccentMain" : "TextDim"];
+            RealTimeLogService.Instance.Log(_isPinned ? "Window pinned on top." : "Window unpinned.");
+        }
+
+        private void UpdateFooterMetrics()
+        {
+            Task.Run(() =>
+            {
+                var cpu = SystemService.GetCpuUsage();
+                var ram = SystemService.GetRamInfo().percent;
+                var gpu = SystemService.GetGpuUsage();
+
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    FooterCpuText.Text = $"C {cpu}%";
+                    FooterMemoryText.Text = $"M {ram}%";
+                    FooterGpuText.Text = $"G {gpu}%";
+                });
+            });
         }
     }
 }

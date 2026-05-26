@@ -3,6 +3,7 @@ using System.IO;
 using System.Management;
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
+using LibreHardwareMonitor.Hardware;
 
 namespace TAY.Services;
 
@@ -10,6 +11,10 @@ public class SystemService
 {
     private static List<PerformanceCounter>? _gpuCounters;
     private static DateTime _lastGpuCounterRefresh = DateTime.MinValue;
+    private static readonly object SensorLock = new();
+    private static Computer? _sensorComputer;
+    private static bool _sensorComputerOpen;
+    private static DateTime _lastSensorRefresh = DateTime.MinValue;
 
     public static (long total, long used, long free, int percent) GetRamInfo()
     {
@@ -159,6 +164,155 @@ public class SystemService
         catch
         {
             return 0;
+        }
+    }
+
+    public static double? GetCpuTemperatureC()
+    {
+        return GetHardwareTemperatureC(
+            h => h.HardwareType == HardwareType.Cpu,
+            "package",
+            "tctl",
+            "tdie",
+            "core max",
+            "cpu core")
+            ?? GetHardwareTemperatureC(
+                IsBoardControllerHardware,
+                true,
+                "cpu",
+                "processor",
+                "package",
+                "tctl",
+                "tdie")
+            ?? GetAcpiThermalZoneTemperatureC();
+    }
+
+    public static double? GetGpuTemperatureC()
+    {
+        return GetHardwareTemperatureC(
+            h => h.HardwareType is HardwareType.GpuAmd or HardwareType.GpuIntel or HardwareType.GpuNvidia,
+            "gpu core",
+            "gpu temperature",
+            "hot spot");
+    }
+
+    private static double? GetHardwareTemperatureC(Func<IHardware, bool> hardwareFilter, params string[] preferredSensorNames)
+    {
+        return GetHardwareTemperatureC(hardwareFilter, false, preferredSensorNames);
+    }
+
+    private static double? GetHardwareTemperatureC(Func<IHardware, bool> hardwareFilter, bool requirePreferredSensor, params string[] preferredSensorNames)
+    {
+        try
+        {
+            lock (SensorLock)
+            {
+                _sensorComputer ??= new Computer
+                {
+                    IsCpuEnabled = true,
+                    IsGpuEnabled = true,
+                    IsMotherboardEnabled = true,
+                    IsControllerEnabled = true
+                };
+
+                if (!_sensorComputerOpen)
+                {
+                    _sensorComputer.Open();
+                    _sensorComputerOpen = true;
+                }
+
+                if (DateTime.UtcNow - _lastSensorRefresh > TimeSpan.FromSeconds(2))
+                {
+                    foreach (var hardware in EnumerateHardware(_sensorComputer.Hardware))
+                    {
+                        hardware.Update();
+                    }
+
+                    _lastSensorRefresh = DateTime.UtcNow;
+                }
+
+                var sensors = EnumerateHardware(_sensorComputer.Hardware)
+                    .Where(hardwareFilter)
+                    .SelectMany(h => h.Sensors)
+                    .Where(s => s.SensorType == SensorType.Temperature && s.Value is > 0 and < 120)
+                    .Select(s => new SensorTemperature(s.Name ?? "", (double)s.Value!.Value))
+                    .ToList();
+
+                if (sensors.Count == 0) return null;
+
+                foreach (var preferredName in preferredSensorNames)
+                {
+                    var preferred = sensors
+                        .Where(s => s.Name.Contains(preferredName, StringComparison.OrdinalIgnoreCase))
+                        .OrderByDescending(s => s.Value)
+                        .FirstOrDefault();
+
+                    if (preferred != null)
+                    {
+                        return preferred.Value;
+                    }
+                }
+
+                if (requirePreferredSensor)
+                {
+                    return null;
+                }
+
+                return sensors.Max(s => s.Value);
+            }
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static bool IsBoardControllerHardware(IHardware hardware)
+    {
+        var kind = hardware.HardwareType.ToString();
+        return kind.Contains("Motherboard", StringComparison.OrdinalIgnoreCase) ||
+               kind.Contains("SuperIO", StringComparison.OrdinalIgnoreCase) ||
+               kind.Contains("Embedded", StringComparison.OrdinalIgnoreCase) ||
+               kind.Contains("Controller", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private sealed record SensorTemperature(string Name, double Value);
+
+    private static double? GetAcpiThermalZoneTemperatureC()
+    {
+        try
+        {
+            using var searcher = new ManagementObjectSearcher(@"root\WMI", "SELECT CurrentTemperature FROM MSAcpi_ThermalZoneTemperature");
+            var values = new List<double>();
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                if (obj["CurrentTemperature"] == null) continue;
+
+                var kelvinTenths = Convert.ToDouble(obj["CurrentTemperature"]);
+                var celsius = kelvinTenths / 10.0 - 273.15;
+                if (celsius > 0 && celsius < 120)
+                {
+                    values.Add(celsius);
+                }
+            }
+
+            return values.Count > 0 ? values.Average() : null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static IEnumerable<IHardware> EnumerateHardware(IEnumerable<IHardware> hardware)
+    {
+        foreach (var item in hardware)
+        {
+            yield return item;
+            foreach (var child in EnumerateHardware(item.SubHardware))
+            {
+                yield return child;
+            }
         }
     }
 
@@ -643,16 +797,73 @@ public class SystemService
     }
     public static List<ProcessInfo> GetTopProcesses(int count = 5)
     {
-        return Process.GetProcesses()
-            .OrderByDescending(p => { try { return p.WorkingSet64; } catch { return 0; } })
+        var firstSample = Process.GetProcesses()
+            .Select(p =>
+            {
+                try
+                {
+                    return new
+                    {
+                        Process = p,
+                        p.Id,
+                        p.ProcessName,
+                        Ram = p.WorkingSet64,
+                        Cpu = p.TotalProcessorTime
+                    };
+                }
+                catch
+                {
+                    try { p.Dispose(); } catch { }
+                    return null;
+                }
+            })
+            .Where(p => p != null)
+            .OrderByDescending(p => p!.Ram)
             .Take(count)
-            .Select(p => new ProcessInfo { Id = p.Id, Name = p.ProcessName, Ram = p.WorkingSet64 })
             .ToList();
+
+        Thread.Sleep(180);
+
+        var intervalMs = 180.0 * Math.Max(1, Environment.ProcessorCount);
+        var rows = new List<ProcessInfo>();
+        foreach (var sample in firstSample)
+        {
+            if (sample == null) continue;
+            try
+            {
+                using var current = Process.GetProcessById(sample.Id);
+                var cpuDelta = current.TotalProcessorTime - sample.Cpu;
+                var cpuPercent = Math.Clamp(cpuDelta.TotalMilliseconds / intervalMs * 100.0, 0, 100);
+                rows.Add(new ProcessInfo
+                {
+                    Id = sample.Id,
+                    Name = sample.ProcessName,
+                    Ram = current.WorkingSet64,
+                    Cpu = cpuPercent
+                });
+            }
+            catch
+            {
+                rows.Add(new ProcessInfo
+                {
+                    Id = sample.Id,
+                    Name = sample.ProcessName,
+                    Ram = sample.Ram,
+                    Cpu = 0
+                });
+            }
+            finally
+            {
+                try { sample.Process.Dispose(); } catch { }
+            }
+        }
+
+        return rows;
     }
 }
 
 public class DriveData { public string Letter { get; set; } = ""; public string Label { get; set; } = ""; public long Total { get; set; } public long Free { get; set; } public long Used { get; set; } }
 public class StartupApp { public int Id { get; set; } public string Name { get; set; } = ""; public string Command { get; set; } = ""; public bool Enabled { get; set; } public string Impact { get; set; } = "medium"; }
 public class PowerPlan { public string Id { get; set; } = ""; public string Name { get; set; } = ""; public bool Active { get; set; } }
-public class ProcessInfo { public int Id { get; set; } public string Name { get; set; } = ""; public long Ram { get; set; } }
+public class ProcessInfo { public int Id { get; set; } public string Name { get; set; } = ""; public long Ram { get; set; } public double Cpu { get; set; } }
 public class FolderInfo { public string Name { get; set; } = ""; public string Path { get; set; } = ""; public long Size { get; set; } }

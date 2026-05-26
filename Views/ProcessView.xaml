@@ -10,100 +10,87 @@
 
     <Page.Transitions>
         <TransitionCollection>
-            <EntranceThemeTransition/>
+            <EntranceThemeTransition />
         </TransitionCollection>
     </Page.Transitions>
 
-    <Grid Margin="24,16,24,24">
+    <Grid Margin="14,14,14,12">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/> <!-- Terminal Column Headers -->
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid Margin="3,0,3,12">
+        <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0">
-                <TextBlock Text="Active processes and memory usage" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
-                <TextBlock Text="Processes" FontFamily="Segoe UI" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,1,0,0"/>
+            <StackPanel>
+                <TextBlock Text="Processes" FontSize="21" FontWeight="SemiBold" />
+                <TextBlock Text="{x:Bind ViewModel.OperationStatus, Mode=OneWay}" FontSize="11" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis" />
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                <Button Content="Refresh" Command="{x:Bind ViewModel.LoadProcessesCommand}" IsEnabled="{x:Bind ViewModel.IsNotRefreshing, Mode=OneWay}" Style="{StaticResource SweetButton}"/>
-                <Button Content="Copy List" Style="{StaticResource OutlineButton}" Click="CopyProcessList_Click"/>
+                <Button Style="{StaticResource GhostButton}" Click="Filter_Click">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <FontIcon Glyph="&#xE71C;" FontSize="13" />
+                        <TextBlock Text="Filter" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource GhostButton}" Command="{x:Bind ViewModel.LoadProcessesCommand}" IsEnabled="{x:Bind ViewModel.IsNotRefreshing, Mode=OneWay}">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <FontIcon Glyph="&#xE72C;" FontSize="13" />
+                        <TextBlock Text="Refresh" />
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </Grid>
 
-        <Border Style="{StaticResource SweetCard}" Grid.Row="1" Margin="3,0,3,12" Padding="12,9">
-            <Grid ColumnSpacing="10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="220"/>
-                </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="0"
-                         PlaceholderText="Search process..."
-                         Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         VerticalAlignment="Center"
-                         CornerRadius="5"
-                         BorderThickness="1"
-                         BorderBrush="{StaticResource RowBorder}"
-                         Background="{StaticResource RowBg}"
-                         Foreground="{StaticResource TextMain}"
-                         PlaceholderForeground="{StaticResource TextMuted}"
-                         FontFamily="Segoe UI"
-                         FontSize="12"
-                         Height="34"/>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                    <ProgressRing IsActive="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}" Width="18" Height="18" Foreground="{StaticResource AccentMain}" VerticalAlignment="Center"/>
-                    <TextBlock Text="{x:Bind ViewModel.OperationStatus, Mode=OneWay}" FontFamily="Segoe UI" FontSize="11" Foreground="{StaticResource TextDim}" VerticalAlignment="Center" MaxWidth="360" TextTrimming="CharacterEllipsis"/>
-                </StackPanel>
-                <ComboBox Grid.Column="2" ItemsSource="{x:Bind ViewModel.SortOptions}" SelectedItem="{x:Bind ViewModel.SelectedSort, Mode=TwoWay}" Height="34" Background="{StaticResource RowBg}" BorderBrush="{StaticResource RowBorder}" Foreground="{StaticResource TextMain}"/>
-            </Grid>
-        </Border>
-
-        <!-- Terminal Table Column Headers -->
-        <Grid Grid.Row="2" Margin="16,0,16,8">
+        <Grid Grid.Row="1" Margin="12,24,12,8">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="70" />
+                <ColumnDefinition Width="78" />
             </Grid.ColumnDefinitions>
-            <TextBlock Text="Process" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}" Grid.Column="0"/>
-            <TextBlock Text="Memory" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}" Grid.Column="1"/>
-            <TextBlock Text="Action" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}" Grid.Column="2" HorizontalAlignment="Right"/>
+            <TextBlock Text="NAME" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}" />
+            <TextBlock Grid.Column="1" Text="CPU" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentMain}" HorizontalAlignment="Center" />
+            <TextBlock Grid.Column="2" Text="MEM" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center" />
         </Grid>
 
-        <!-- Process ListView (Sleek stripped-down terminal rows) -->
-        <ListView ItemsSource="{x:Bind ViewModel.Processes}" SelectionMode="None" Grid.Row="3" Padding="0,0,0,16">
+        <ListView Grid.Row="2"
+                  ItemsSource="{x:Bind ViewModel.Processes}"
+                  SelectionMode="None"
+                  Padding="0,0,0,10"
+                  ItemContainerStyle="{StaticResource FlatListViewItemStyle}">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="viewmodels:ProcessItemVM">
-                    <!-- Flat console output row -->
-                    <Border Background="{StaticResource RowBg}" CornerRadius="4" Padding="10,3" Margin="3,0,3,3" BorderThickness="1" BorderBrush="{StaticResource RowBorder}">
-                        <Grid>
+                    <Border Background="{StaticResource RowBg}" BorderBrush="{StaticResource RowBorder}" BorderThickness="0,0,0,1" Padding="12,8">
+                        <Grid ColumnSpacing="10">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="170"/>
+                                <ColumnDefinition Width="34" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="70" />
+                                <ColumnDefinition Width="78" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            
-                            <!-- Column 0: Name and ID -->
-                            <StackPanel VerticalAlignment="Center" Grid.Column="0" Orientation="Horizontal" Spacing="12">
-                                <TextBlock Text="{x:Bind Id}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextDim}" Width="50"/>
-                                <TextBlock Text="{x:Bind Name}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource TextMain}" TextTrimming="CharacterEllipsis"/>
+                            <Border Width="28" Height="28" CornerRadius="5" Background="#333333" BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                                <FontIcon Glyph="&#xE9D2;" FontSize="12" Foreground="{StaticResource TextDim}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                                <TextBlock Text="{x:Bind Name}" FontSize="13" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{x:Bind Id}" FontSize="10" Foreground="{StaticResource TextMuted}" />
                             </StackPanel>
-                            
-                            <!-- Column 1: Memory Allocation -->
-                            <TextBlock Text="{x:Bind RamStr}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource AccentWarning}" VerticalAlignment="Center" Grid.Column="1"/>
-                            
-                            <!-- Column 2: Terminal Bracket Button -->
-                            <StackPanel Grid.Column="2" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                                <TextBlock Text="{x:Bind ProtectionLabel}" FontFamily="Consolas" FontSize="9" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
-                                <Button Content="End" Click="EndTask_Click" IsEnabled="{x:Bind CanEndTask}" Style="{StaticResource DestructiveOutlineButton}"/>
+                            <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="3">
+                                <TextBlock Text="{x:Bind CpuStr}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentDanger}" HorizontalAlignment="Right" />
+                                <ProgressBar Value="{x:Bind CpuValue}" Minimum="0" Maximum="100" Height="3" Foreground="{StaticResource AccentDanger}" Background="#3A3A3A" />
                             </StackPanel>
+                            <StackPanel Grid.Column="3" VerticalAlignment="Center" Spacing="3">
+                                <TextBlock Text="{x:Bind RamStr}" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Right" />
+                                <ProgressBar Value="{x:Bind RamPercent}" Minimum="0" Maximum="100" Height="3" Foreground="{StaticResource TextDim}" Background="#3A3A3A" />
+                            </StackPanel>
+                            <Button Grid.Column="4" Style="{StaticResource GhostButton}" Click="EndTask_Click" IsEnabled="{x:Bind CanEndTask}" Padding="8,3">
+                                <FontIcon Glyph="&#xE712;" FontSize="12" />
+                            </Button>
                         </Grid>
                     </Border>
                 </DataTemplate>

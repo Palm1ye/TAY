@@ -2,304 +2,212 @@
     x:Class="TAY.Views.DashboardView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:TAY.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:lvc="using:LiveChartsCore.SkiaSharpView.WinUI"
     mc:Ignorable="d"
-    Unloaded="Page_Unloaded"
+    NavigationCacheMode="Required"
     Background="Transparent">
 
     <Page.Transitions>
         <TransitionCollection>
-            <EntranceThemeTransition/>
+            <EntranceThemeTransition />
         </TransitionCollection>
     </Page.Transitions>
 
-    <Grid Margin="24,16,24,24">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <Grid Margin="3,0,3,12">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0">
-                <TextBlock Text="System control center" FontFamily="Segoe UI" FontSize="12" Foreground="{StaticResource TextDim}"/>
-                <TextBlock Text="Dashboard" FontFamily="Segoe UI" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,1,0,0"/>
-            </StackPanel>
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                <Button Style="{StaticResource OutlineButton}" Click="CopySnapshot_Click">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon Glyph="&#xE8C8;" FontSize="13"/>
-                        <TextBlock Text="Copy Snapshot"/>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-        </Grid>
-
-        <Grid Grid.Row="1" ColumnSpacing="8">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1.32*"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
-
-            <Grid Grid.Column="0" RowSpacing="8">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <Border Style="{StaticResource SweetCard}" Padding="16,14">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <TextBlock Text="System metrics" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,0,0,14"/>
-
-                        <Grid Grid.Row="1" ColumnSpacing="18">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Grid.Column="0" Spacing="3">
-                                <TextBlock Text="CPU" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}"/>
-                                <TextBlock Text="{x:Bind ViewModel.CpuUsage, Mode=OneWay}" FontFamily="Consolas" FontSize="27" FontWeight="Bold" Foreground="{StaticResource AccentMain}"/>
-                                <TextBlock Text="{x:Bind ViewModel.CpuStatus, Mode=OneWay}" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
-                            </StackPanel>
-
-                            <StackPanel Grid.Column="1" Spacing="3">
-                                <TextBlock Text="Memory" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}"/>
-                                <TextBlock Text="{x:Bind ViewModel.RamUsage, Mode=OneWay}" FontFamily="Consolas" FontSize="27" FontWeight="Bold" Foreground="{StaticResource AccentWarning}"/>
-                                <TextBlock Text="{x:Bind ViewModel.RamStatus, Mode=OneWay}" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
-                            </StackPanel>
-
-                            <StackPanel Grid.Column="2" Spacing="3">
-                                <TextBlock Text="GPU" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}"/>
-                                <TextBlock Text="{x:Bind ViewModel.GpuUsage, Mode=OneWay}" FontFamily="Consolas" FontSize="27" FontWeight="Bold" Foreground="{StaticResource AccentInfo}"/>
-                                <TextBlock Text="Render load" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
-                            </StackPanel>
-
-                            <StackPanel Grid.Column="3" Spacing="3">
-                                <TextBlock Text="Storage" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}"/>
-                                <TextBlock Text="{x:Bind ViewModel.DiskUsage, Mode=OneWay}" FontFamily="Consolas" FontSize="27" FontWeight="Bold" Foreground="{StaticResource TextMain}"/>
-                                <TextBlock Text="{x:Bind ViewModel.StorageStatus, Mode=OneWay}" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
-                            </StackPanel>
-
-                            <StackPanel Grid.Column="4" Spacing="3">
-                                <TextBlock Text="Processes" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}"/>
-                                <TextBlock Text="{x:Bind ViewModel.ProcessCount, Mode=OneWay}" FontFamily="Consolas" FontSize="27" FontWeight="Bold" Foreground="{StaticResource AccentMain}"/>
-                                <TextBlock Text="{x:Bind ViewModel.ProcessStatus, Mode=OneWay}" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
-                            </StackPanel>
-                        </Grid>
-                    </Grid>
-                </Border>
-
-                <Border Style="{StaticResource SweetCard}" Grid.Row="1" Padding="16,14">
-                    <Grid ColumnSpacing="14">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <Border Width="44" Height="44" CornerRadius="6" Background="#1058D5C9" BorderBrush="#3358D5C9" BorderThickness="1">
-                            <FontIcon Glyph="&#xE9D9;" FontSize="20" Foreground="{StaticResource AccentMain}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <StackPanel Grid.Column="1" Spacing="4">
-                            <TextBlock Text="{x:Bind ViewModel.DiagnosisTitle, Mode=OneWay}" FontFamily="Segoe UI" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                            <TextBlock Text="{x:Bind ViewModel.DiagnosisDetail, Mode=OneWay}" FontSize="12" Foreground="{StaticResource TextDim}" TextWrapping="Wrap"/>
-                            <TextBlock Text="{x:Bind ViewModel.DiagnosisSignal, Mode=OneWay}" FontFamily="Consolas" FontSize="10" Foreground="{StaticResource AccentWarning}" TextTrimming="CharacterEllipsis"/>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="14,14,14,12" Spacing="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Dashboard" FontSize="21" FontWeight="SemiBold" />
+                    <TextBlock Text="Live system status - refreshed continuously" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Button Style="{StaticResource GhostButton}" Click="CopySnapshot_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <FontIcon Glyph="&#xE8C8;" FontSize="13" />
+                            <TextBlock Text="Snapshot" />
                         </StackPanel>
-                        <Button Grid.Column="2" Content="{x:Bind ViewModel.DiagnosisActionText, Mode=OneWay}" Style="{StaticResource SweetButton}" Click="OpenDiagnosis_Click" VerticalAlignment="Center"/>
-                    </Grid>
-                </Border>
-
-                <Border Style="{StaticResource SweetCard}" Grid.Row="2">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <TextBlock Text="Tools" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" Margin="0,0,0,10"/>
-
-                        <Grid Grid.Row="1" ColumnSpacing="8" RowSpacing="8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-
-                            <Button Style="{StaticResource ToolButton}" Click="OpenHardware_Click" Padding="14,12">
-                                <Grid MinHeight="62">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <FontIcon Glyph="&#xE950;" FontSize="19" Foreground="{StaticResource AccentMain}" Margin="0,0,12,0" VerticalAlignment="Center"/>
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                        <TextBlock Text="Hardware inventory" FontWeight="SemiBold"/>
-                                        <TextBlock Text="Open CPU, GPU, memory, disks and adapter details" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
-                                    </StackPanel>
-                                    <FontIcon Grid.Column="2" Glyph="&#xE72A;" FontSize="12" VerticalAlignment="Center"/>
-                                </Grid>
-                            </Button>
-
-                            <Button Grid.Column="1" Style="{StaticResource ToolButton}" Click="OpenBoost_Click" Padding="14,12">
-                                <Grid MinHeight="62">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <FontIcon Glyph="&#xE950;" FontSize="19" Foreground="{StaticResource AccentWarning}" Margin="0,0,12,0" VerticalAlignment="Center"/>
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                        <TextBlock Text="Boost tuning" FontWeight="SemiBold"/>
-                                        <TextBlock Text="Memory sweep, DNS, game mode, shell tools" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
-                                    </StackPanel>
-                                    <FontIcon Grid.Column="2" Glyph="&#xE72A;" FontSize="12" VerticalAlignment="Center"/>
-                                </Grid>
-                            </Button>
-
-                            <Button Grid.Row="1" Style="{StaticResource ToolButton}" Click="OpenClean_Click" Padding="14,12">
-                                <Grid MinHeight="62">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <FontIcon Glyph="&#xE74D;" FontSize="19" Foreground="{StaticResource AccentDanger}" Margin="0,0,12,0" VerticalAlignment="Center"/>
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                        <TextBlock Text="Clean selected cache" FontWeight="SemiBold"/>
-                                        <TextBlock Text="Scan temp folders before deleting anything" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
-                                    </StackPanel>
-                                    <FontIcon Grid.Column="2" Glyph="&#xE72A;" FontSize="12" VerticalAlignment="Center"/>
-                                </Grid>
-                            </Button>
-
-                            <Button Grid.Row="1" Grid.Column="1" Style="{StaticResource ToolButton}" Click="OpenStorage_Click" Padding="14,12">
-                                <Grid MinHeight="62">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <FontIcon Glyph="&#xEDA2;" FontSize="19" Foreground="{StaticResource AccentMain}" Margin="0,0,12,0" VerticalAlignment="Center"/>
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                        <TextBlock Text="Find large files" FontWeight="SemiBold"/>
-                                        <TextBlock Text="Analyze drive usage and storage categories" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
-                                    </StackPanel>
-                                    <FontIcon Grid.Column="2" Glyph="&#xE72A;" FontSize="12" VerticalAlignment="Center"/>
-                                </Grid>
-                            </Button>
-
-                            <Button Grid.Row="2" Style="{StaticResource ToolButton}" Click="OpenProcesses_Click" Padding="14,12">
-                                <Grid MinHeight="62">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <FontIcon Glyph="&#xE8F1;" FontSize="19" Foreground="{StaticResource AccentInfo}" Margin="0,0,12,0" VerticalAlignment="Center"/>
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                        <TextBlock Text="Review processes" FontWeight="SemiBold"/>
-                                        <TextBlock Text="Sort by memory and end non-critical tasks" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
-                                    </StackPanel>
-                                    <FontIcon Grid.Column="2" Glyph="&#xE72A;" FontSize="12" VerticalAlignment="Center"/>
-                                </Grid>
-                            </Button>
-
-                            <Button Grid.Row="2" Grid.Column="1" Style="{StaticResource ToolButton}" Click="OpenStartup_Click" Padding="14,12">
-                                <Grid MinHeight="62">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <FontIcon Glyph="&#xE945;" FontSize="19" Foreground="{StaticResource AccentWarning}" Margin="0,0,12,0" VerticalAlignment="Center"/>
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                        <TextBlock Text="Manage startup apps" FontWeight="SemiBold"/>
-                                        <TextBlock Text="Disable launch items that slow boot" FontSize="10" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
-                                    </StackPanel>
-                                    <FontIcon Grid.Column="2" Glyph="&#xE72A;" FontSize="12" VerticalAlignment="Center"/>
-                                </Grid>
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </Border>
+                    </Button>
+                    <Button Style="{StaticResource GhostButton}" Click="Refresh_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <FontIcon Glyph="&#xE72C;" FontSize="13" />
+                            <TextBlock Text="Refresh" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
             </Grid>
 
-            <Grid Grid.Column="1" RowSpacing="8">
+            <Border Style="{StaticResource SweetCard}" Padding="16">
+                <Grid ColumnSpacing="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Border Width="49" Height="49" CornerRadius="8" Background="{StaticResource AccentMain}">
+                        <FontIcon Glyph="{x:Bind ViewModel.DiagnosisIconGlyph, Mode=OneWay}" FontSize="24" Foreground="#111111" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                        <TextBlock Text="{x:Bind ViewModel.DiagnosisTitle, Mode=OneWay}" FontSize="15" FontWeight="SemiBold" />
+                        <TextBlock Text="{x:Bind ViewModel.DiagnosisDetail, Mode=OneWay}" FontSize="12" Foreground="{StaticResource TextDim}" TextWrapping="Wrap" MaxLines="2" />
+                    </StackPanel>
+                    <Button Grid.Column="2" Content="{x:Bind ViewModel.DiagnosisActionText, Mode=OneWay}" Style="{StaticResource SweetButton}" Click="OpenDiagnosis_Click" VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+
+            <Grid ColumnSpacing="8" RowSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Border Style="{StaticResource SweetCard}" Grid.Row="0">
+                <Border Style="{StaticResource CompactCard}" MinHeight="114">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="24" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <Grid Margin="0,0,0,8">
-                            <TextBlock Text="Telemetry history" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
-                                <TextBlock Text="CPU" FontSize="10" Foreground="{StaticResource AccentMain}"/>
-                                <TextBlock Text="RAM" FontSize="10" Foreground="{StaticResource AccentWarning}"/>
-                                <TextBlock Text="GPU" FontSize="10" Foreground="{StaticResource AccentInfo}"/>
-                            </StackPanel>
-                        </Grid>
-                        <Border Grid.Row="1" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" Background="{StaticResource RowBgAlt}" CornerRadius="5" Padding="6" MinHeight="170">
-                            <lvc:CartesianChart
-                                Series="{Binding CpuSeries}"
-                                XAxes="{Binding XAxes}"
-                                YAxes="{Binding YAxes}"
-                                Background="Transparent"/>
-                        </Border>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="&#xE950;" FontSize="12" Foreground="{StaticResource AccentMain}" />
+                            <TextBlock Text="CPU" FontSize="12" Foreground="{StaticResource TextDim}" />
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="{x:Bind ViewModel.CpuUsage, Mode=OneWay}" FontSize="23" FontWeight="SemiBold" Margin="0,7,0,0" />
+                        <controls:SparklineControl Grid.Row="2"
+                                                   Values="{x:Bind ViewModel.CpuSparklineValues, Mode=OneWay}"
+                                                   Stroke="{StaticResource AccentMain}"
+                                                   Fill="{StaticResource AccentMainSoft}"
+                                                   LineThickness="1.8"
+                                                   Height="24"
+                                                   Margin="0,0,0,0" />
+                        <TextBlock Grid.Row="3" Text="{x:Bind ViewModel.CpuDetail, Mode=OneWay}" FontSize="11" Foreground="{StaticResource TextMuted}" />
                     </Grid>
                 </Border>
 
-                <Border Style="{StaticResource SweetCard}" Grid.Row="1">
-                    <StackPanel Spacing="10">
-                        <TextBlock Text="Power profile" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextMain}"/>
-                        <ComboBox ItemsSource="{x:Bind ViewModel.PowerPlans, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.SelectedPlan, Mode=TwoWay}" DisplayMemberPath="Name" HorizontalAlignment="Stretch" CornerRadius="5" Background="{StaticResource RowBg}" Foreground="{StaticResource TextMain}" BorderBrush="{StaticResource RowBorder}" FontFamily="Consolas" FontSize="11" Height="32"/>
-                    </StackPanel>
+                <Border Grid.Column="1" Style="{StaticResource CompactCard}" MinHeight="114">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="24" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="&#xE8B7;" FontSize="12" Foreground="{StaticResource AccentMemory}" />
+                            <TextBlock Text="Memory" FontSize="12" Foreground="{StaticResource TextDim}" />
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="{x:Bind ViewModel.RamUsage, Mode=OneWay}" FontSize="23" FontWeight="SemiBold" Margin="0,7,0,0" />
+                        <controls:SparklineControl Grid.Row="2"
+                                                   Values="{x:Bind ViewModel.RamSparklineValues, Mode=OneWay}"
+                                                   Stroke="{StaticResource AccentMemory}"
+                                                   LineThickness="1.8"
+                                                   Height="24"
+                                                   Margin="0,0,0,0" />
+                        <TextBlock Grid.Row="3" Text="{x:Bind ViewModel.RamDetail, Mode=OneWay}" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                    </Grid>
                 </Border>
 
-                <Border Style="{StaticResource SweetCard}" Grid.Row="2">
-                    <Grid ColumnSpacing="8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Border Background="{StaticResource RowBg}" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="5" Padding="10,8">
-                            <StackPanel>
-                                <TextBlock Text="Session uptime" FontSize="10" Foreground="{StaticResource TextMuted}"/>
-                                <TextBlock Text="{x:Bind ViewModel.Uptime, Mode=OneWay}" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" TextTrimming="CharacterEllipsis"/>
-                            </StackPanel>
-                        </Border>
-                        <Border Grid.Column="1" Background="{StaticResource RowBg}" BorderBrush="{StaticResource RowBorder}" BorderThickness="1" CornerRadius="5" Padding="10,8">
-                            <StackPanel>
-                                <TextBlock Text="Disk free" FontSize="10" Foreground="{StaticResource TextMuted}"/>
-                                <TextBlock Text="{x:Bind ViewModel.DiskFree, Mode=OneWay}" FontFamily="Consolas" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextMain}" TextTrimming="CharacterEllipsis"/>
-                            </StackPanel>
-                        </Border>
+                <Border Grid.Row="1" Style="{StaticResource CompactCard}" MinHeight="114">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="24" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="&#xE7F4;" FontSize="12" Foreground="{StaticResource AccentGpu}" />
+                            <TextBlock Text="GPU" FontSize="12" Foreground="{StaticResource TextDim}" />
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="{x:Bind ViewModel.GpuUsage, Mode=OneWay}" FontSize="23" FontWeight="SemiBold" Margin="0,7,0,0" />
+                        <controls:SparklineControl Grid.Row="2"
+                                                   Values="{x:Bind ViewModel.GpuSparklineValues, Mode=OneWay}"
+                                                   Stroke="{StaticResource AccentGpu}"
+                                                   Fill="{StaticResource AccentGreenSoft}"
+                                                   LineThickness="1.8"
+                                                   Height="24"
+                                                   Margin="0,0,0,0" />
+                        <TextBlock Grid.Row="3" Text="{x:Bind ViewModel.GpuDetail, Mode=OneWay}" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource CompactCard}" MinHeight="114">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="24" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="&#xE839;" FontSize="12" Foreground="{StaticResource AccentPurple}" />
+                            <TextBlock Text="Network" FontSize="12" Foreground="{StaticResource TextDim}" />
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="{x:Bind ViewModel.NetworkUsage, Mode=OneWay}" FontSize="22" FontWeight="SemiBold" Margin="0,7,0,0" />
+                        <controls:SparklineControl Grid.Row="2"
+                                                   Values="{x:Bind ViewModel.NetworkSparklineValues, Mode=OneWay}"
+                                                   Stroke="{StaticResource AccentPurple}"
+                                                   LineThickness="1.8"
+                                                   Height="24"
+                                                   Margin="0,0,0,0" />
+                        <TextBlock Grid.Row="3" Text="{x:Bind ViewModel.NetworkDetail, Mode=OneWay}" FontSize="11" Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis" />
                     </Grid>
                 </Border>
             </Grid>
-        </Grid>
-    </Grid>
+
+            <TextBlock Text="QUICK ACTIONS" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextMuted}" Margin="2,8,0,0" />
+
+            <Border Style="{StaticResource SweetCard}" Padding="0">
+                <StackPanel>
+                    <Button Style="{StaticResource ToolButton}" Click="OpenClean_Click">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border Width="34" Height="34" CornerRadius="5" Background="#333333" BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                                <FontIcon Glyph="&#xE74D;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="Clean caches" FontSize="14" />
+                                <TextBlock Text="{x:Bind ViewModel.DiskFree, Mode=OneWay}" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                            </StackPanel>
+                            <FontIcon Grid.Column="2" Glyph="&#xE76C;" FontSize="12" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" />
+                        </Grid>
+                    </Button>
+
+                    <Rectangle Height="1" Fill="{StaticResource RowBorder}" />
+
+                    <Button Style="{StaticResource ToolButton}" Click="OpenStartup_Click">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border Width="34" Height="34" CornerRadius="5" Background="#333333" BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                                <FontIcon Glyph="&#xE756;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="Review startup" FontSize="14" />
+                                <TextBlock Text="{x:Bind ViewModel.ProcessStatus, Mode=OneWay}" FontSize="11" Foreground="{StaticResource TextMuted}" />
+                            </StackPanel>
+                            <FontIcon Grid.Column="2" Glyph="&#xE76C;" FontSize="12" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" />
+                        </Grid>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
 </Page>

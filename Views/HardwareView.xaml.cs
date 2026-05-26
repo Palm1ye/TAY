@@ -54,5 +54,10 @@ namespace TAY.Views
             data.SetText(string.Join(Environment.NewLine, lines));
             Clipboard.SetContent(data);
         }
+
+        private void ReviewDrivers_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(BoostView));
+        }
     }
 }

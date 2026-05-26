@@ -356,6 +356,7 @@ namespace TAY.ViewModels
         public string Label { get; }
         public string CapacityStr { get; }
         public double UsedPercent { get; }
+        public string UsedPercentStr => $"{UsedPercent:0}%";
         public double UsedWidth { get; }
 
         public DriveItemVM(DriveData d, DiskViewModel parent)

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Management;
 using System.Net.NetworkInformation;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -25,10 +26,34 @@ namespace TAY.Services
         public bool DHCPEnabled { get; set; } = true;
     }
 
+    public class SpeedTestResult
+    {
+        public double DownloadMbps { get; set; }
+        public double UploadMbps { get; set; }
+        public long LatencyMs { get; set; }
+        public string Provider { get; set; } = "Cloudflare";
+    }
+
     public class NetworkService
     {
         private static readonly string BackupDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TAY");
         private static readonly string BackupPath = Path.Combine(BackupDir, "dns_backup.json");
+        private static readonly HttpClient SpeedTestClient = CreateSpeedTestClient();
+
+        private static HttpClient CreateSpeedTestClient()
+        {
+            var client = new HttpClient
+            {
+                Timeout = TimeSpan.FromSeconds(25)
+            };
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
+            client.DefaultRequestHeaders.Accept.ParseAdd("*/*");
+            client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("en-US,en;q=0.9");
+            client.DefaultRequestHeaders.Referrer = new Uri("https://speed.cloudflare.com/");
+            client.DefaultRequestHeaders.TryAddWithoutValidation("Origin", "https://speed.cloudflare.com");
+            client.DefaultRequestHeaders.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue { NoCache = true };
+            return client;
+        }
 
         public static async Task<bool> FlushDnsAsync()
         {
@@ -146,6 +171,80 @@ namespace TAY.Services
 
                 return options;
             });
+        }
+
+        public static async Task<SpeedTestResult> RunQuickSpeedTestAsync()
+        {
+            RealTimeLogService.Instance.Log("Running in-app Cloudflare quick speed test...");
+
+            var latency = await MeasureCloudflareLatencyAsync();
+            var download = await MeasureDownloadMbpsAsync(12_000_000);
+            var upload = await MeasureUploadMbpsAsync(4_000_000);
+
+            RealTimeLogService.Instance.Log($"Speed test complete. Down {download:0.0} Mbps / Up {upload:0.0} Mbps / {latency} ms.");
+
+            return new SpeedTestResult
+            {
+                DownloadMbps = download,
+                UploadMbps = upload,
+                LatencyMs = latency
+            };
+        }
+
+        private static async Task<long> MeasureCloudflareLatencyAsync()
+        {
+            var samples = new List<long>();
+            for (var i = 0; i < 3; i++)
+            {
+                var sw = Stopwatch.StartNew();
+                using var response = await SpeedTestClient.GetAsync($"https://speed.cloudflare.com/__down?bytes=0&cacheBust={Guid.NewGuid():N}");
+                response.EnsureSuccessStatusCode();
+                sw.Stop();
+                samples.Add(sw.ElapsedMilliseconds);
+            }
+
+            return samples.Count > 0 ? (long)samples.Average() : -1;
+        }
+
+        private static async Task<double> MeasureDownloadMbpsAsync(int bytes)
+        {
+            var sw = Stopwatch.StartNew();
+            var received = 0L;
+
+            using var response = await SpeedTestClient.GetAsync($"https://speed.cloudflare.com/__down?bytes={bytes}&cacheBust={Guid.NewGuid():N}", HttpCompletionOption.ResponseHeadersRead);
+            response.EnsureSuccessStatusCode();
+            await using var stream = await response.Content.ReadAsStreamAsync();
+
+            var buffer = new byte[64 * 1024];
+            int read;
+            while ((read = await stream.ReadAsync(buffer)) > 0)
+            {
+                received += read;
+            }
+
+            sw.Stop();
+            return ToMbps(received, sw.Elapsed.TotalSeconds);
+        }
+
+        private static async Task<double> MeasureUploadMbpsAsync(int bytes)
+        {
+            var payload = new byte[bytes];
+            Random.Shared.NextBytes(payload);
+
+            using var content = new ByteArrayContent(payload);
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+
+            var sw = Stopwatch.StartNew();
+            using var response = await SpeedTestClient.PostAsync($"https://speed.cloudflare.com/__up?cacheBust={Guid.NewGuid():N}", content);
+            response.EnsureSuccessStatusCode();
+            sw.Stop();
+
+            return ToMbps(bytes, sw.Elapsed.TotalSeconds);
+        }
+
+        private static double ToMbps(long bytes, double seconds)
+        {
+            return seconds <= 0 ? 0 : bytes * 8.0 / seconds / 1_000_000.0;
         }
 
         public static async Task<bool> ApplyBestDnsAsync(DnsOption bestDns)
